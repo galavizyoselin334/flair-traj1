@@ -1,0 +1,65 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"INSTALL",
+			"FLAIR_DEMO"
+		],
+		"files" : 
+		[
+			"/home/yoselin/flair/flair-src/cmake-modules/GlobalCmakeFlair.cmake",
+			"uav/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 19,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 136,
+				"parent" : 1
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "/home/yoselin/flair/flair-install/bin/demos/x86_64/MyTraj",
+			"paths" : 
+			[
+				"uav/MyTraj_rt"
+			],
+			"targetId" : "MyTraj_rt::@889d690331083004c518",
+			"targetIndex" : 4,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "/home/yoselin/flair/flair-install/bin/demos/x86_64/MyTraj",
+			"paths" : 
+			[
+				"uav/MyTraj_nrt"
+			],
+			"targetId" : "MyTraj_nrt::@889d690331083004c518",
+			"targetIndex" : 0,
+			"type" : "target"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "uav",
+		"source" : "uav"
+	}
+}

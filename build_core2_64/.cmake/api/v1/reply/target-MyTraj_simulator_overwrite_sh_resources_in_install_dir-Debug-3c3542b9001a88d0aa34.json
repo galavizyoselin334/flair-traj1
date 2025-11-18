@@ -1,0 +1,81 @@
+{
+	"backtrace" : 3,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_custom_target",
+			"FLAIR_DEMO",
+			"FLAIR_DEMO_HOST_CXX"
+		],
+		"files" : 
+		[
+			"/home/yoselin/flair/flair-src/cmake-modules/GlobalCmakeFlair.cmake",
+			"simulator/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 13,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 200,
+				"parent" : 1
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 160,
+				"parent" : 2
+			}
+		]
+	},
+	"id" : "MyTraj_simulator_overwrite_sh_resources_in_install_dir::@f1f3e991e10b5af6b966",
+	"name" : "MyTraj_simulator_overwrite_sh_resources_in_install_dir",
+	"paths" : 
+	{
+		"build" : "simulator",
+		"source" : "simulator"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"name" : "CMake Rules",
+			"sourceIndexes" : 
+			[
+				1
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 3,
+			"isGenerated" : true,
+			"path" : "build/simulator/CMakeFiles/MyTraj_simulator_overwrite_sh_resources_in_install_dir",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/simulator/CMakeFiles/MyTraj_simulator_overwrite_sh_resources_in_install_dir.rule",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "UTILITY"
+}

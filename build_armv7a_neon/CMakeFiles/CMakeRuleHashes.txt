@@ -1,0 +1,4 @@
+# Hashes of file build rules.
+58be13232f5589499c477323d3e4a09b uav/CMakeFiles/MyTraj_overwrite_all_resources_in_install_dir
+e2ab4435b2f3d80e012af556e9035cff uav/CMakeFiles/MyTraj_overwrite_sh_resources_in_install_dir
+6ba58277ce742ec16b8930754378c2aa uav/CMakeFiles/MyTraj_overwrite_xml_resources_in_install_dir

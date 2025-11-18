@@ -1,0 +1,190 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "2.8"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "simulator",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-simulator-Debug-73762484ba95b6c392b9.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "2.8"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "simulator",
+					"targetIndexes" : 
+					[
+						5,
+						6,
+						7,
+						8,
+						9
+					]
+				},
+				{
+					"build" : "uav",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-uav-Debug-563f8b047e5e76f62af8.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "2.8"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "uav",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1
+					],
+					"directoryIndexes" : 
+					[
+						0,
+						2
+					],
+					"name" : "MyTraj",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1
+					],
+					"name" : "MyTraj_simulator",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						5,
+						6,
+						7,
+						8,
+						9
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 2,
+					"id" : "MyTraj_nrt::@889d690331083004c518",
+					"jsonFile" : "target-MyTraj_nrt-Debug-5c4bfb3b1b1d302ab778.json",
+					"name" : "MyTraj_nrt",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "MyTraj_overwrite_all_resources_in_install_dir::@889d690331083004c518",
+					"jsonFile" : "target-MyTraj_overwrite_all_resources_in_install_dir-Debug-dbdb6bd94a76c83c8348.json",
+					"name" : "MyTraj_overwrite_all_resources_in_install_dir",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "MyTraj_overwrite_sh_resources_in_install_dir::@889d690331083004c518",
+					"jsonFile" : "target-MyTraj_overwrite_sh_resources_in_install_dir-Debug-762e852cc5b977c1f21b.json",
+					"name" : "MyTraj_overwrite_sh_resources_in_install_dir",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "MyTraj_overwrite_xml_resources_in_install_dir::@889d690331083004c518",
+					"jsonFile" : "target-MyTraj_overwrite_xml_resources_in_install_dir-Debug-0e875fbf664bdfac832f.json",
+					"name" : "MyTraj_overwrite_xml_resources_in_install_dir",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "MyTraj_rt::@889d690331083004c518",
+					"jsonFile" : "target-MyTraj_rt-Debug-1487a76a6c72a68ccc31.json",
+					"name" : "MyTraj_rt",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "MyTraj_simulator_nrt::@f1f3e991e10b5af6b966",
+					"jsonFile" : "target-MyTraj_simulator_nrt-Debug-5a23d348a7f33fbcf87e.json",
+					"name" : "MyTraj_simulator_nrt",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "MyTraj_simulator_overwrite_all_resources_in_install_dir::@f1f3e991e10b5af6b966",
+					"jsonFile" : "target-MyTraj_simulator_overwrite_all_resources_in_install_dir-Debug-24340803aeb26ce92e94.json",
+					"name" : "MyTraj_simulator_overwrite_all_resources_in_install_dir",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "MyTraj_simulator_overwrite_sh_resources_in_install_dir::@f1f3e991e10b5af6b966",
+					"jsonFile" : "target-MyTraj_simulator_overwrite_sh_resources_in_install_dir-Debug-3c3542b9001a88d0aa34.json",
+					"name" : "MyTraj_simulator_overwrite_sh_resources_in_install_dir",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "MyTraj_simulator_overwrite_xml_resources_in_install_dir::@f1f3e991e10b5af6b966",
+					"jsonFile" : "target-MyTraj_simulator_overwrite_xml_resources_in_install_dir-Debug-67c7c06e18debd2205bd.json",
+					"name" : "MyTraj_simulator_overwrite_xml_resources_in_install_dir",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "MyTraj_simulator_rt::@f1f3e991e10b5af6b966",
+					"jsonFile" : "target-MyTraj_simulator_rt-Debug-928892835cf628f41bc7.json",
+					"name" : "MyTraj_simulator_rt",
+					"projectIndex" : 1
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/yoselin/flair/my_src/MyTraj/build",
+		"source" : "/home/yoselin/flair/my_src/MyTraj"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}

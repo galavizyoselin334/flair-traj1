@@ -1,0 +1,31 @@
+{
+"configurations": [
+{
+"name": "Linux",
+"includePath": [
+"${workspaceFolder}/**",
+"$FLAIR_ROOT/flair-install/include",
+"$FLAIR_ROOT/flair-install/include/FlairCore",
+"$FLAIR_ROOT/flair-install/include/FlairSensorActuator",
+"$FLAIR_ROOT/flair-install/include/FlairFilter",
+"$FLAIR_ROOT/flair-install/include/FlairMeta",
+"$FLAIR_ROOT/flair-install/include/FlairSimulator",
+"$FLAIR_ROOT/flair-src/lib/FlairCore/src",
+"$FLAIR_ROOT/flair-src/lib/FlairSensorActuator/src",
+"$FLAIR_ROOT/flair-src/lib/FlairFilter/src",
+"$FLAIR_ROOT/flair-src/lib/FlairMeta/src",
+"$FLAIR_ROOT/flair-src/lib/FlairSimulator/src",
+"$FLAIR_ROOT/flair-src/lib/FlairFilter/src/unexported/",
+"/usr/include/eigen3"
+],
+"defines": ["CORE2_64",
+"_GLIBCXX_USE_CXX11_ABI=0"],
+"compilerPath": "/usr/bin/g++",
+"cStandard": "c11",
+"cppStandard": "c++11",
+"intelliSenseMode": "linux-gcc-x64",
+"configurationProvider": "ms-vscode.cmake-tools"
+}
+],
+"version": 4
+}

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeLite_Project Name="MyTraj_rt" InternalType="">
+	<VirtualDirectory Name="src">
+		<File Name="../../uav/src/MyTraj.cpp"/>
+		<File Name="../../uav/src/TrajectoryGenerator6.cpp"/>
+		<File Name="../../uav/src/TrajectoryGenerator6_impl.cpp"/>
+		<File Name="../../uav/src/main.cpp"/>
+	</VirtualDirectory>
+	<VirtualDirectory Name="include">
+		<File Name="../../uav/src/MyTraj.h"/>
+		<File Name="../../uav/src/TrajectoryGenerator6.h"/>
+		<File Name="../../uav/src/TrajectoryGenerator6_impl.h"/>
+	</VirtualDirectory>
+	<Settings Type="Executable">
+		<Configuration Name="NoConfig" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+			<Compiler Options="-g" Required="yes" PreCompiledHeader="">
+				<IncludePath Value="."/>
+			</Compiler>
+			<Linker Options="" Required="yes"/>
+			<ResourceCompiler Options="" Required="no"/>
+			<General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./" Command="./$(ProjectName)" CommandArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
+			<Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
+				<PostConnectCommands/>
+				<StartupCommands/>
+			</Debugger>
+			<PreBuild/>
+			<PostBuild/>
+			<CustomBuild Enabled="yes">
+				<Target Name="install/local">/usr/bin/gmake -j 12 install/local</Target>
+				<Target Name="install">/usr/bin/gmake -j 12 install</Target>
+				<Target Name="list_install_components">/usr/bin/gmake -j 12 list_install_components</Target>
+				<Target Name="MyTraj_overwrite_xml_resources_in_install_dir">/usr/bin/gmake -j 12 MyTraj_overwrite_xml_resources_in_install_dir</Target>
+				<Target Name="MyTraj_overwrite_sh_resources_in_install_dir">/usr/bin/gmake -j 12 MyTraj_overwrite_sh_resources_in_install_dir</Target>
+				<Target Name="edit_cache">/usr/bin/gmake -j 12 edit_cache</Target>
+				<Target Name="MyTraj_overwrite_all_resources_in_install_dir">/usr/bin/gmake -j 12 MyTraj_overwrite_all_resources_in_install_dir</Target>
+				<RebuildCommand>/usr/bin/gmake -j 12 clean &amp;&amp; /usr/bin/gmake -j 12</RebuildCommand>
+				<CleanCommand>/usr/bin/gmake -j 12 clean</CleanCommand>
+				<BuildCommand>/usr/bin/gmake -j 12</BuildCommand>
+				<SingleFileCommand>/usr/bin/gmake -f$(ProjectPath)/Makefile $(CurrentFileName).cpp.o</SingleFileCommand>
+				<PreprocessFileCommand/>
+				<WorkingDirectory>$(ProjectPath)</WorkingDirectory>
+				<Target Name="rebuild_cache">/usr/bin/gmake -j 12 rebuild_cache</Target>
+				<RebuildCommand>/usr/bin/gmake -j 12 clean &amp;&amp; /usr/bin/gmake -j 12</RebuildCommand>
+				<CleanCommand>/usr/bin/gmake -j 12 clean</CleanCommand>
+				<BuildCommand>/usr/bin/gmake -j 12</BuildCommand>
+				<SingleFileCommand>/usr/bin/gmake -f$(ProjectPath)/Makefile $(CurrentFileName).cpp.o</SingleFileCommand>
+				<PreprocessFileCommand/>
+				<WorkingDirectory>$(ProjectPath)</WorkingDirectory>
+			</CustomBuild>
+			<Completion EnableCpp11="yes" EnableCpp14="yes">
+				<SearchPaths>/home/yoselin/flair/flair-install/include/FlairCore
+/home/yoselin/flair/flair-install/include/FlairSensorActuator
+/home/yoselin/flair/flair-install/include/FlairFilter
+/home/yoselin/flair/flair-install/include/FlairMeta
+/opt/robomap3/2.1.3/core2-64/sysroots/x86_64-pokysdk-linux/usr/lib/x86_64-poky-linux/gcc/x86_64-poky-linux/4.9.3/include
+/opt/robomap3/2.1.3/core2-64/sysroots/x86_64-pokysdk-linux/usr/lib/x86_64-poky-linux/gcc/x86_64-poky-linux/4.9.3/include-fixed
+</SearchPaths>
+				<SearchPaths>/home/yoselin/flair/flair-install/include/FlairCore
+/home/yoselin/flair/flair-install/include/FlairSensorActuator
+/home/yoselin/flair/flair-install/include/FlairFilter
+/home/yoselin/flair/flair-install/include/FlairMeta
+/opt/robomap3/2.1.3/core2-64/sysroots/x86_64-pokysdk-linux/usr/lib/x86_64-poky-linux/gcc/x86_64-poky-linux/4.9.3/include
+/opt/robomap3/2.1.3/core2-64/sysroots/x86_64-pokysdk-linux/usr/lib/x86_64-poky-linux/gcc/x86_64-poky-linux/4.9.3/include-fixed
+</SearchPaths>
+			</Completion>
+			<AdditionalRules>
+				<CustomPostBuild/>
+				<CustomPreBuild/>
+			</AdditionalRules>
+		</Configuration>
+		<GlobalSettings>
+			<Compiler Options="">
+				<IncludePath Value="."/>
+			</Compiler>
+			<Linker Options="">
+				<LibraryPath Value="."/>
+			</Linker>
+			<ResourceCompiler Options=""/>
+		</GlobalSettings>
+	</Settings>
+</CodeLite_Project>

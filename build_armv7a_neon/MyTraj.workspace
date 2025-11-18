@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeLite_Workspace Name="MyTraj">
+	<Project Name="MyTraj_nrt" Path="uav/MyTraj_nrt.project" Active="No"/>
+	<Project Name="MyTraj_rt" Path="uav/MyTraj_rt.project" Active="No"/>
+	<BuildMatrix>
+		<WorkspaceConfiguration Name="NoConfig" Selected="yes">
+			<Project Name="install/local" ConfigName="NoConfig"/>
+			<Project Name="install" ConfigName="NoConfig"/>
+			<Project Name="list_install_components" ConfigName="NoConfig"/>
+			<Project Name="rebuild_cache" ConfigName="NoConfig"/>
+			<Project Name="edit_cache" ConfigName="NoConfig"/>
+			<Project Name="install/local" ConfigName="NoConfig"/>
+			<Project Name="install" ConfigName="NoConfig"/>
+			<Project Name="list_install_components" ConfigName="NoConfig"/>
+			<Project Name="rebuild_cache" ConfigName="NoConfig"/>
+			<Project Name="edit_cache" ConfigName="NoConfig"/>
+			<Project Name="install/local" ConfigName="NoConfig"/>
+			<Project Name="install" ConfigName="NoConfig"/>
+			<Project Name="list_install_components" ConfigName="NoConfig"/>
+			<Project Name="MyTraj_overwrite_xml_resources_in_install_dir" ConfigName="NoConfig"/>
+			<Project Name="MyTraj_overwrite_sh_resources_in_install_dir" ConfigName="NoConfig"/>
+			<Project Name="edit_cache" ConfigName="NoConfig"/>
+			<Project Name="MyTraj_overwrite_all_resources_in_install_dir" ConfigName="NoConfig"/>
+			<Project Name="MyTraj_nrt" ConfigName="NoConfig"/>
+			<Project Name="rebuild_cache" ConfigName="NoConfig"/>
+			<Project Name="MyTraj_rt" ConfigName="NoConfig"/>
+		</WorkspaceConfiguration>
+	</BuildMatrix>
+</CodeLite_Workspace>
