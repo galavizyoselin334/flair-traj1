@@ -14,6 +14,7 @@ SET(SRC_FILES
 	src/MyTraj.cpp
     src/TrajectoryGenerator6_impl.cpp
     src/TrajectoryGenerator6.cpp
+    src/controlQuaternion.cpp
 )
 
 FLAIR_DEMO(${PROJECT_NAME} "${SRC_FILES}"

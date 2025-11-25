@@ -124,7 +124,7 @@ uav/clean: uav/CMakeFiles/MyTraj_overwrite_xml_resources_in_install_dir.dir/clea
 simulator/CMakeFiles/MyTraj_simulator_rt.dir/all:
 	$(MAKE) $(MAKESILENT) -f simulator/CMakeFiles/MyTraj_simulator_rt.dir/build.make simulator/CMakeFiles/MyTraj_simulator_rt.dir/depend
 	$(MAKE) $(MAKESILENT) -f simulator/CMakeFiles/MyTraj_simulator_rt.dir/build.make simulator/CMakeFiles/MyTraj_simulator_rt.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/yoselin/flair/my_src/MyTraj/build/CMakeFiles --progress-num=13,14 "Built target MyTraj_simulator_rt"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/yoselin/flair/my_src/MyTraj/build/CMakeFiles --progress-num=15,16 "Built target MyTraj_simulator_rt"
 .PHONY : simulator/CMakeFiles/MyTraj_simulator_rt.dir/all
 
 # Build rule for subdir invocation for target.
@@ -150,7 +150,7 @@ simulator/CMakeFiles/MyTraj_simulator_rt.dir/clean:
 simulator/CMakeFiles/MyTraj_simulator_nrt.dir/all:
 	$(MAKE) $(MAKESILENT) -f simulator/CMakeFiles/MyTraj_simulator_nrt.dir/build.make simulator/CMakeFiles/MyTraj_simulator_nrt.dir/depend
 	$(MAKE) $(MAKESILENT) -f simulator/CMakeFiles/MyTraj_simulator_nrt.dir/build.make simulator/CMakeFiles/MyTraj_simulator_nrt.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/yoselin/flair/my_src/MyTraj/build/CMakeFiles --progress-num=11,12 "Built target MyTraj_simulator_nrt"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/yoselin/flair/my_src/MyTraj/build/CMakeFiles --progress-num=13,14 "Built target MyTraj_simulator_nrt"
 .PHONY : simulator/CMakeFiles/MyTraj_simulator_nrt.dir/all
 
 # Build rule for subdir invocation for target.
@@ -254,12 +254,12 @@ simulator/CMakeFiles/MyTraj_simulator_overwrite_xml_resources_in_install_dir.dir
 uav/CMakeFiles/MyTraj_rt.dir/all:
 	$(MAKE) $(MAKESILENT) -f uav/CMakeFiles/MyTraj_rt.dir/build.make uav/CMakeFiles/MyTraj_rt.dir/depend
 	$(MAKE) $(MAKESILENT) -f uav/CMakeFiles/MyTraj_rt.dir/build.make uav/CMakeFiles/MyTraj_rt.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/yoselin/flair/my_src/MyTraj/build/CMakeFiles --progress-num=6,7,8,9,10 "Built target MyTraj_rt"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/yoselin/flair/my_src/MyTraj/build/CMakeFiles --progress-num=7,8,9,10,11,12 "Built target MyTraj_rt"
 .PHONY : uav/CMakeFiles/MyTraj_rt.dir/all
 
 # Build rule for subdir invocation for target.
 uav/CMakeFiles/MyTraj_rt.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/yoselin/flair/my_src/MyTraj/build/CMakeFiles 5
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/yoselin/flair/my_src/MyTraj/build/CMakeFiles 6
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 uav/CMakeFiles/MyTraj_rt.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/yoselin/flair/my_src/MyTraj/build/CMakeFiles 0
 .PHONY : uav/CMakeFiles/MyTraj_rt.dir/rule
@@ -280,12 +280,12 @@ uav/CMakeFiles/MyTraj_rt.dir/clean:
 uav/CMakeFiles/MyTraj_nrt.dir/all:
 	$(MAKE) $(MAKESILENT) -f uav/CMakeFiles/MyTraj_nrt.dir/build.make uav/CMakeFiles/MyTraj_nrt.dir/depend
 	$(MAKE) $(MAKESILENT) -f uav/CMakeFiles/MyTraj_nrt.dir/build.make uav/CMakeFiles/MyTraj_nrt.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/yoselin/flair/my_src/MyTraj/build/CMakeFiles --progress-num=1,2,3,4,5 "Built target MyTraj_nrt"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/yoselin/flair/my_src/MyTraj/build/CMakeFiles --progress-num=1,2,3,4,5,6 "Built target MyTraj_nrt"
 .PHONY : uav/CMakeFiles/MyTraj_nrt.dir/all
 
 # Build rule for subdir invocation for target.
 uav/CMakeFiles/MyTraj_nrt.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/yoselin/flair/my_src/MyTraj/build/CMakeFiles 5
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/yoselin/flair/my_src/MyTraj/build/CMakeFiles 6
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 uav/CMakeFiles/MyTraj_nrt.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/yoselin/flair/my_src/MyTraj/build/CMakeFiles 0
 .PHONY : uav/CMakeFiles/MyTraj_nrt.dir/rule

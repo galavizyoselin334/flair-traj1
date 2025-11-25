@@ -25,6 +25,7 @@ namespace flair {
     }
     namespace filter {
         class TrajectoryGenerator6;
+        class Law;  // ← NUEVO: Tu control con cuaterniones
     }
     namespace meta {
         class MetaVrpnObject;
@@ -60,11 +61,14 @@ class MyTraj : public flair::meta::UavStateMachine {
         const flair::core::AhrsData *GetOrientation(void) const override;
         void AltitudeValues(float &z,float &dz) const override;
         void GetReferenceAltitude(float &z_ref, float &dz_ref) override;
-        void PositionValues(flair::core::Vector2Df &pos_error,flair::core::Vector2Df &vel_error,float &yaw_ref);
+        void ComputeCustomTorques(flair::core::Euler &torques) override;
+        float ComputeCustomThrust(void) override; 
+        
         flair::core::AhrsData *GetReferenceOrientation(void) override;
         void SignalEvent(Event_t event) override;
-
-        flair::filter::Pid *uX, *uY;
+  
+        // Control con cuaterniones
+        flair::filter::Law *quaternionControl;
 
         flair::core::Vector2Df posHold;
         float yawHold;
@@ -77,9 +81,9 @@ class MyTraj : public flair::meta::UavStateMachine {
         
         flair::core::AhrsData *customReferenceOrientation, *customOrientation;
 
-        float frozenAltitudeRef;       // Altitud congelada
-        float frozenAltitudeVelRef;    // Velocidad congelada
-        bool useFrozenAltitudeRef;     // Flag para usar referencia congelada
+        float frozenAltitudeRef;       
+        float frozenAltitudeVelRef;    
+        bool useFrozenAltitudeRef;     
 };
 
 #endif // MYTRAJ_H

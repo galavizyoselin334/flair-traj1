@@ -20,19 +20,19 @@
 			{
 				"command" : 1,
 				"file" : 1,
-				"line" : 19,
+				"line" : 20,
 				"parent" : 0
 			},
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 156,
+				"line" : 160,
 				"parent" : 1
 			}
 		]
 	},
-	"id" : "MyTraj_overwrite_all_resources_in_install_dir::@889d690331083004c518",
-	"name" : "MyTraj_overwrite_all_resources_in_install_dir",
+	"id" : "MyTraj_overwrite_sh_resources_in_install_dir::@889d690331083004c518",
+	"name" : "MyTraj_overwrite_sh_resources_in_install_dir",
 	"paths" : 
 	{
 		"build" : "uav",
@@ -60,13 +60,13 @@
 		{
 			"backtrace" : 2,
 			"isGenerated" : true,
-			"path" : "build/uav/CMakeFiles/MyTraj_overwrite_all_resources_in_install_dir",
+			"path" : "build/uav/CMakeFiles/MyTraj_overwrite_sh_resources_in_install_dir",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 0,
 			"isGenerated" : true,
-			"path" : "build/uav/CMakeFiles/MyTraj_overwrite_all_resources_in_install_dir.rule",
+			"path" : "build/uav/CMakeFiles/MyTraj_overwrite_sh_resources_in_install_dir.rule",
 			"sourceGroupIndex" : 1
 		}
 	],

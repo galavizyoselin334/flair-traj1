@@ -43,7 +43,7 @@
 				{
 					"build" : "uav",
 					"hasInstallRule" : true,
-					"jsonFile" : "directory-uav-Debug-563f8b047e5e76f62af8.json",
+					"jsonFile" : "directory-uav-Debug-1262f1a1820980b9140c.json",
 					"minimumCMakeVersion" : 
 					{
 						"string" : "2.8"
@@ -106,35 +106,35 @@
 				{
 					"directoryIndex" : 2,
 					"id" : "MyTraj_nrt::@889d690331083004c518",
-					"jsonFile" : "target-MyTraj_nrt-Debug-5c4bfb3b1b1d302ab778.json",
+					"jsonFile" : "target-MyTraj_nrt-Debug-a754ea35b0a6ff90a6c0.json",
 					"name" : "MyTraj_nrt",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 2,
 					"id" : "MyTraj_overwrite_all_resources_in_install_dir::@889d690331083004c518",
-					"jsonFile" : "target-MyTraj_overwrite_all_resources_in_install_dir-Debug-dbdb6bd94a76c83c8348.json",
+					"jsonFile" : "target-MyTraj_overwrite_all_resources_in_install_dir-Debug-96cc7cfdd9acb6472931.json",
 					"name" : "MyTraj_overwrite_all_resources_in_install_dir",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 2,
 					"id" : "MyTraj_overwrite_sh_resources_in_install_dir::@889d690331083004c518",
-					"jsonFile" : "target-MyTraj_overwrite_sh_resources_in_install_dir-Debug-762e852cc5b977c1f21b.json",
+					"jsonFile" : "target-MyTraj_overwrite_sh_resources_in_install_dir-Debug-d8487fcc41d3459bedbc.json",
 					"name" : "MyTraj_overwrite_sh_resources_in_install_dir",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 2,
 					"id" : "MyTraj_overwrite_xml_resources_in_install_dir::@889d690331083004c518",
-					"jsonFile" : "target-MyTraj_overwrite_xml_resources_in_install_dir-Debug-0e875fbf664bdfac832f.json",
+					"jsonFile" : "target-MyTraj_overwrite_xml_resources_in_install_dir-Debug-c6ceb3563cbad394d77d.json",
 					"name" : "MyTraj_overwrite_xml_resources_in_install_dir",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 2,
 					"id" : "MyTraj_rt::@889d690331083004c518",
-					"jsonFile" : "target-MyTraj_rt-Debug-1487a76a6c72a68ccc31.json",
+					"jsonFile" : "target-MyTraj_rt-Debug-bcffd6181aebe18145ea.json",
 					"name" : "MyTraj_rt",
 					"projectIndex" : 0
 				},

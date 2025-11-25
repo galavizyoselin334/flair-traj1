@@ -312,6 +312,33 @@ src/TrajectoryGenerator6_impl.cpp.s:
 	cd /home/yoselin/flair/my_src/MyTraj/build && $(MAKE) $(MAKESILENT) -f uav/CMakeFiles/MyTraj_nrt.dir/build.make uav/CMakeFiles/MyTraj_nrt.dir/src/TrajectoryGenerator6_impl.cpp.s
 .PHONY : src/TrajectoryGenerator6_impl.cpp.s
 
+src/controlQuaternion.o: src/controlQuaternion.cpp.o
+.PHONY : src/controlQuaternion.o
+
+# target to build an object file
+src/controlQuaternion.cpp.o:
+	cd /home/yoselin/flair/my_src/MyTraj/build && $(MAKE) $(MAKESILENT) -f uav/CMakeFiles/MyTraj_rt.dir/build.make uav/CMakeFiles/MyTraj_rt.dir/src/controlQuaternion.cpp.o
+	cd /home/yoselin/flair/my_src/MyTraj/build && $(MAKE) $(MAKESILENT) -f uav/CMakeFiles/MyTraj_nrt.dir/build.make uav/CMakeFiles/MyTraj_nrt.dir/src/controlQuaternion.cpp.o
+.PHONY : src/controlQuaternion.cpp.o
+
+src/controlQuaternion.i: src/controlQuaternion.cpp.i
+.PHONY : src/controlQuaternion.i
+
+# target to preprocess a source file
+src/controlQuaternion.cpp.i:
+	cd /home/yoselin/flair/my_src/MyTraj/build && $(MAKE) $(MAKESILENT) -f uav/CMakeFiles/MyTraj_rt.dir/build.make uav/CMakeFiles/MyTraj_rt.dir/src/controlQuaternion.cpp.i
+	cd /home/yoselin/flair/my_src/MyTraj/build && $(MAKE) $(MAKESILENT) -f uav/CMakeFiles/MyTraj_nrt.dir/build.make uav/CMakeFiles/MyTraj_nrt.dir/src/controlQuaternion.cpp.i
+.PHONY : src/controlQuaternion.cpp.i
+
+src/controlQuaternion.s: src/controlQuaternion.cpp.s
+.PHONY : src/controlQuaternion.s
+
+# target to generate assembly for a file
+src/controlQuaternion.cpp.s:
+	cd /home/yoselin/flair/my_src/MyTraj/build && $(MAKE) $(MAKESILENT) -f uav/CMakeFiles/MyTraj_rt.dir/build.make uav/CMakeFiles/MyTraj_rt.dir/src/controlQuaternion.cpp.s
+	cd /home/yoselin/flair/my_src/MyTraj/build && $(MAKE) $(MAKESILENT) -f uav/CMakeFiles/MyTraj_nrt.dir/build.make uav/CMakeFiles/MyTraj_nrt.dir/src/controlQuaternion.cpp.s
+.PHONY : src/controlQuaternion.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -365,6 +392,9 @@ help:
 	@echo "... src/TrajectoryGenerator6_impl.o"
 	@echo "... src/TrajectoryGenerator6_impl.i"
 	@echo "... src/TrajectoryGenerator6_impl.s"
+	@echo "... src/controlQuaternion.o"
+	@echo "... src/controlQuaternion.i"
+	@echo "... src/controlQuaternion.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

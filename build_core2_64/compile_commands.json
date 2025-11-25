@@ -31,6 +31,11 @@
 },
 {
   "directory": "/home/yoselin/flair/my_src/MyTraj/build/uav",
+  "command": "/usr/bin/g++  -I/usr/include/eigen3 -I/home/yoselin/flair/flair-install/include/FlairCore -I/home/yoselin/flair/flair-install/include/FlairSensorActuator -I/home/yoselin/flair/flair-install/include/HdsSensorActuator -I/home/yoselin/flair/flair-install/include/FlairFilter -I/home/yoselin/flair/flair-install/include/FlairMeta -g   -std=c++11 -o CMakeFiles/MyTraj_rt.dir/src/controlQuaternion.cpp.o -c /home/yoselin/flair/my_src/MyTraj/uav/src/controlQuaternion.cpp",
+  "file": "/home/yoselin/flair/my_src/MyTraj/uav/src/controlQuaternion.cpp"
+},
+{
+  "directory": "/home/yoselin/flair/my_src/MyTraj/build/uav",
   "command": "/usr/bin/g++  -I/usr/include/eigen3 -I/home/yoselin/flair/flair-install/include/FlairCore -I/home/yoselin/flair/flair-install/include/FlairSensorActuator -I/home/yoselin/flair/flair-install/include/HdsSensorActuator -I/home/yoselin/flair/flair-install/include/FlairFilter -I/home/yoselin/flair/flair-install/include/FlairMeta -g   -std=c++11 -o CMakeFiles/MyTraj_nrt.dir/src/main.cpp.o -c /home/yoselin/flair/my_src/MyTraj/uav/src/main.cpp",
   "file": "/home/yoselin/flair/my_src/MyTraj/uav/src/main.cpp"
 },
@@ -48,5 +53,10 @@
   "directory": "/home/yoselin/flair/my_src/MyTraj/build/uav",
   "command": "/usr/bin/g++  -I/usr/include/eigen3 -I/home/yoselin/flair/flair-install/include/FlairCore -I/home/yoselin/flair/flair-install/include/FlairSensorActuator -I/home/yoselin/flair/flair-install/include/HdsSensorActuator -I/home/yoselin/flair/flair-install/include/FlairFilter -I/home/yoselin/flair/flair-install/include/FlairMeta -g   -std=c++11 -o CMakeFiles/MyTraj_nrt.dir/src/TrajectoryGenerator6.cpp.o -c /home/yoselin/flair/my_src/MyTraj/uav/src/TrajectoryGenerator6.cpp",
   "file": "/home/yoselin/flair/my_src/MyTraj/uav/src/TrajectoryGenerator6.cpp"
+},
+{
+  "directory": "/home/yoselin/flair/my_src/MyTraj/build/uav",
+  "command": "/usr/bin/g++  -I/usr/include/eigen3 -I/home/yoselin/flair/flair-install/include/FlairCore -I/home/yoselin/flair/flair-install/include/FlairSensorActuator -I/home/yoselin/flair/flair-install/include/HdsSensorActuator -I/home/yoselin/flair/flair-install/include/FlairFilter -I/home/yoselin/flair/flair-install/include/FlairMeta -g   -std=c++11 -o CMakeFiles/MyTraj_nrt.dir/src/controlQuaternion.cpp.o -c /home/yoselin/flair/my_src/MyTraj/uav/src/controlQuaternion.cpp",
+  "file": "/home/yoselin/flair/my_src/MyTraj/uav/src/controlQuaternion.cpp"
 }
 ]

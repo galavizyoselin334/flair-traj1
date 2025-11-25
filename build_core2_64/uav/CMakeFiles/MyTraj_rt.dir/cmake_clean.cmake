@@ -5,6 +5,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/MyTraj_rt.dir/src/TrajectoryGenerator6.cpp.o.d"
   "CMakeFiles/MyTraj_rt.dir/src/TrajectoryGenerator6_impl.cpp.o"
   "CMakeFiles/MyTraj_rt.dir/src/TrajectoryGenerator6_impl.cpp.o.d"
+  "CMakeFiles/MyTraj_rt.dir/src/controlQuaternion.cpp.o"
+  "CMakeFiles/MyTraj_rt.dir/src/controlQuaternion.cpp.o.d"
   "CMakeFiles/MyTraj_rt.dir/src/main.cpp.o"
   "CMakeFiles/MyTraj_rt.dir/src/main.cpp.o.d"
   "MyTraj_rt"

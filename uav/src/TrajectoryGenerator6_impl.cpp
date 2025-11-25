@@ -72,10 +72,6 @@ TrajectoryGenerator6_impl::~TrajectoryGenerator6_impl() {
   delete output;
 }
 
-// Función para calcular coeficientes de polinomio de 4er grado
-// boundary conditions
-// x(ti) = Xi, X'(ti) = 0
-// x(tobj) = xobj, X(tf) = xf, X´(tf)=0
 Eigen::Matrix<double,5,1> TrajectoryGenerator6_impl::CalculateCoefficientsXY(double xi, double xobj, double xf,
                                                                              double ti, double tobj, double tf, double vi) {
   Eigen::Matrix<double,5,5> A = Eigen::Matrix<double,5,5>::Zero();
@@ -97,8 +93,6 @@ Eigen::Matrix<double,5,1> TrajectoryGenerator6_impl::CalculateCoefficientsXY(dou
   return coef;
 }
 
-// Evaluar posicion en el polinomio de 4to grado
-// X(t) = a*t^4 + b*t^3 + c*t² + d*t + e
 double TrajectoryGenerator6_impl::EvaluatePositionXY(double t, 
                                                     const Eigen::Matrix<double, 5, 1>& coef) {
   double t2 = t * t;
@@ -112,8 +106,6 @@ double TrajectoryGenerator6_impl::EvaluatePositionXY(double t,
          coef(4);         //e 
 }
 
-// Evaluar velocidad (derivada del polinomio)
-
 double TrajectoryGenerator6_impl::EvaluateVelocityXY(double t,
                                                     const Eigen::Matrix<double, 5, 1>& coef) {
   double t2 = t * t;
@@ -125,8 +117,6 @@ double TrajectoryGenerator6_impl::EvaluateVelocityXY(double t,
          coef (3);
 }
 
-// Evaluar aceleración (segunda derivada del polinomio)
-// X''(t) = 6*a*t + 2*b
 double TrajectoryGenerator6_impl::EvaluateAccelerationXY(double t,
                                                         const Eigen::Matrix<double, 5, 1>& coef) {
   double t2 = t * t;
@@ -135,12 +125,6 @@ double TrajectoryGenerator6_impl::EvaluateAccelerationXY(double t,
          2 * coef(2);
 }
 
-
-// Función para calcular coeficientes de polinomio de 6to grado
-// boundary conditions
-// Z(ti_traj) = zi, Z'(ti_traj) = 0, Z''(ti_traj) = 0
-// Z(tobj) = zm, Z'(tobj) = 0
-// Z(tf_traj) = zf, Z'(tf_traj) = 0
 void TrajectoryGenerator6_impl::CalculateCoefficientsZ(double zi, double zm, double zf,
                                                        double ti_traj, double tobj, double tf_traj) {
   // Z(t) = a*t^6 + b*t^5 + c*t^4 + d*t^3 + e*t^2 + f*t + h
@@ -182,8 +166,7 @@ double TrajectoryGenerator6_impl::EvaluatePosition(double t,
          coef(6);          // h
 }
 
-// Evaluar velocidad (derivada del polinomio)
-// Z'(t) = 6*a*t^5 + 5*b*t^4 + 4*c*t^3 + 3*d*t^2 + 2*e*t + f
+
 double TrajectoryGenerator6_impl::EvaluateVelocity(double t,
                                                     const Eigen::Matrix<double, 7, 1>& coef) {
   double t2 = t * t;
@@ -199,8 +182,7 @@ double TrajectoryGenerator6_impl::EvaluateVelocity(double t,
          coef(5);
 }
 
-// Evaluar aceleración (segunda derivada del polinomio)
-// Z''(t) = 30*a*t^4 + 20*b*t^3 + 12*c*t^2 + 6*d*t + 2*e
+
 double TrajectoryGenerator6_impl::EvaluateAcceleration(double t,
                                                         const Eigen::Matrix<double, 7, 1>& coef) {
   double t2 = t * t;
@@ -261,7 +243,7 @@ void TrajectoryGenerator6_impl::StartTraj(const Vector3Df &start,
   coefficients_x = CalculateCoefficientsXY(xi, xobj, xf, ti, tobj, tf, vxi);
   coefficients_y = CalculateCoefficientsXY(yi, yobj, yf, ti, tobj, tf, vyi);
   
-  // Guardar tiempos*
+  // Guardar tiempos
   this->ti_traj = ti_traj;
   this->tf_traj = tf_traj;
   this->tobj = tobj;
@@ -352,7 +334,6 @@ void TrajectoryGenerator6_impl::Update(Time time) {
     vel.x = vel.y = vel.z = 0;
     acc.x = acc.y = acc.z = 0;
   }
-
   // Actualizar matriz de salida
   output->GetMutex();
   output->SetValueNoMutex(0, 0, des_pos.x);

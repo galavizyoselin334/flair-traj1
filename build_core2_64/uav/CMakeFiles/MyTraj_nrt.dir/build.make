@@ -125,12 +125,27 @@ uav/CMakeFiles/MyTraj_nrt.dir/src/TrajectoryGenerator6.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/MyTraj_nrt.dir/src/TrajectoryGenerator6.cpp.s"
 	cd /home/yoselin/flair/my_src/MyTraj/build/uav && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/yoselin/flair/my_src/MyTraj/uav/src/TrajectoryGenerator6.cpp -o CMakeFiles/MyTraj_nrt.dir/src/TrajectoryGenerator6.cpp.s
 
+uav/CMakeFiles/MyTraj_nrt.dir/src/controlQuaternion.cpp.o: uav/CMakeFiles/MyTraj_nrt.dir/flags.make
+uav/CMakeFiles/MyTraj_nrt.dir/src/controlQuaternion.cpp.o: ../uav/src/controlQuaternion.cpp
+uav/CMakeFiles/MyTraj_nrt.dir/src/controlQuaternion.cpp.o: uav/CMakeFiles/MyTraj_nrt.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/yoselin/flair/my_src/MyTraj/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object uav/CMakeFiles/MyTraj_nrt.dir/src/controlQuaternion.cpp.o"
+	cd /home/yoselin/flair/my_src/MyTraj/build/uav && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT uav/CMakeFiles/MyTraj_nrt.dir/src/controlQuaternion.cpp.o -MF CMakeFiles/MyTraj_nrt.dir/src/controlQuaternion.cpp.o.d -o CMakeFiles/MyTraj_nrt.dir/src/controlQuaternion.cpp.o -c /home/yoselin/flair/my_src/MyTraj/uav/src/controlQuaternion.cpp
+
+uav/CMakeFiles/MyTraj_nrt.dir/src/controlQuaternion.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/MyTraj_nrt.dir/src/controlQuaternion.cpp.i"
+	cd /home/yoselin/flair/my_src/MyTraj/build/uav && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/yoselin/flair/my_src/MyTraj/uav/src/controlQuaternion.cpp > CMakeFiles/MyTraj_nrt.dir/src/controlQuaternion.cpp.i
+
+uav/CMakeFiles/MyTraj_nrt.dir/src/controlQuaternion.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/MyTraj_nrt.dir/src/controlQuaternion.cpp.s"
+	cd /home/yoselin/flair/my_src/MyTraj/build/uav && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/yoselin/flair/my_src/MyTraj/uav/src/controlQuaternion.cpp -o CMakeFiles/MyTraj_nrt.dir/src/controlQuaternion.cpp.s
+
 # Object files for target MyTraj_nrt
 MyTraj_nrt_OBJECTS = \
 "CMakeFiles/MyTraj_nrt.dir/src/main.cpp.o" \
 "CMakeFiles/MyTraj_nrt.dir/src/MyTraj.cpp.o" \
 "CMakeFiles/MyTraj_nrt.dir/src/TrajectoryGenerator6_impl.cpp.o" \
-"CMakeFiles/MyTraj_nrt.dir/src/TrajectoryGenerator6.cpp.o"
+"CMakeFiles/MyTraj_nrt.dir/src/TrajectoryGenerator6.cpp.o" \
+"CMakeFiles/MyTraj_nrt.dir/src/controlQuaternion.cpp.o"
 
 # External object files for target MyTraj_nrt
 MyTraj_nrt_EXTERNAL_OBJECTS =
@@ -139,6 +154,7 @@ uav/MyTraj_nrt: uav/CMakeFiles/MyTraj_nrt.dir/src/main.cpp.o
 uav/MyTraj_nrt: uav/CMakeFiles/MyTraj_nrt.dir/src/MyTraj.cpp.o
 uav/MyTraj_nrt: uav/CMakeFiles/MyTraj_nrt.dir/src/TrajectoryGenerator6_impl.cpp.o
 uav/MyTraj_nrt: uav/CMakeFiles/MyTraj_nrt.dir/src/TrajectoryGenerator6.cpp.o
+uav/MyTraj_nrt: uav/CMakeFiles/MyTraj_nrt.dir/src/controlQuaternion.cpp.o
 uav/MyTraj_nrt: uav/CMakeFiles/MyTraj_nrt.dir/build.make
 uav/MyTraj_nrt: /home/yoselin/flair/flair-install/lib/x86_64/libFlairMeta.a
 uav/MyTraj_nrt: /home/yoselin/flair/flair-install/lib/x86_64/libFlairFilter.a
@@ -147,7 +163,7 @@ uav/MyTraj_nrt: /home/yoselin/flair/flair-install/lib/x86_64/libFlairSensorActua
 uav/MyTraj_nrt: /home/yoselin/flair/flair-install/lib/x86_64/libFlairCore_nrt.a
 uav/MyTraj_nrt: /usr/lib/x86_64-linux-gnu/libxml2.so
 uav/MyTraj_nrt: uav/CMakeFiles/MyTraj_nrt.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/yoselin/flair/my_src/MyTraj/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable MyTraj_nrt"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/yoselin/flair/my_src/MyTraj/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable MyTraj_nrt"
 	cd /home/yoselin/flair/my_src/MyTraj/build/uav && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/MyTraj_nrt.dir/link.txt --verbose=$(VERBOSE)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "MyTraj_nrt built for  architecture"
 
