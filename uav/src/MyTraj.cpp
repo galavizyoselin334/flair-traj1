@@ -88,16 +88,18 @@ MyTraj::MyTraj(TargetController *controller): UavStateMachine(controller),
     
     // 
     uX = new Pid(setupLawTab->At(1,0), "u_x");
-    //uX->UseDefaultPlot(graphLawTab->NewRow());
+    uX->UseDefaultPlot(graphLawTab->NewRow());
     uY = new Pid(setupLawTab->At(1,1), "u_y");
-    //uY->UseDefaultPlot(graphLawTab->LastRowLastCol());
-
+    uY->UseDefaultPlot(graphLawTab->LastRowLastCol());
+    getFrameworkManager()->AddDeviceToLog(uX); 
+    //uX->AddDataToLog(uY);
     // Orientación de referencia
     customReferenceOrientation = new AhrsData(this, "reference");
     uav->GetAhrs()->AddPlot(customReferenceOrientation, DataPlot::Yellow);
     AddDataToControlLawLog(customReferenceOrientation);
     AddDeviceToControlLawLog(uX);
     AddDeviceToControlLawLog(uY);
+    
 
     customOrientation = new AhrsData(this, "orientation");
 }
@@ -141,9 +143,17 @@ void MyTraj::GetReferenceAltitude(float &z_ref, float &dz_ref) {
         Vector3Df des_pos, des_vel;
         sixTrajectory->GetPosition(des_pos);
         sixTrajectory->GetSpeed(des_vel);
-        
+            
         z_ref = -des_pos.z;
         dz_ref = -des_vel.z;
+        // Actualizar las referencias durante la trayectoria
+        frozenAltitudeRef = z_ref;
+        frozenAltitudeVelRef = dz_ref;
+        
+    } else if (useFrozenAltitudeRef) {
+        // Después de detener: usar referencias del último momento de la trayectoria
+        z_ref = frozenAltitudeRef;
+        dz_ref = 0.0f;  // Velocidad a cero
     } else {
         GetDefaultReferenceAltitude(z_ref, dz_ref);
     }
@@ -206,7 +216,7 @@ void MyTraj::PositionValues(Vector2Df &pos_error, Vector2Df &vel_error, float &y
         vel_error = uav_2Dvel - des_2Dvel;
         
         // Mantener yaw inicial durante trayectoria , no queremos rotar
-        yaw_ref = yawHold;
+        yaw_ref = sixTrajectory->GetYaw();
         
     } else {
         // Default: sin movimiento, mantener yaw actual
@@ -229,6 +239,7 @@ void MyTraj::SignalEvent(Event_t event) {
     case Event_t::TakingOff:
         behaviourMode = BehaviourMode_t::Default;
         vrpnLost = false;
+        useFrozenAltitudeRef = false; //seteamos la flag a false 
         break;
     case Event_t::EnteringControlLoop:
         if ((behaviourMode == BehaviourMode_t::SixthTrajectory) && (!sixTrajectory->IsRunning())) {
@@ -314,6 +325,13 @@ void MyTraj::VrpnPositionHold(void) {
     uavVrpn->GetPosition(vrpnPosition);
     vrpnPosition.To2Dxy(posHold);
 
+    // Congelar altitud actual
+    float z_current, dz_current;
+    AltitudeValues(z_current, dz_current);
+    frozenAltitudeRef = z_current;
+    frozenAltitudeVelRef = 0.0f;
+    useFrozenAltitudeRef = true;
+
     uX->Reset();
     uY->Reset();
     
@@ -340,6 +358,7 @@ void MyTraj::StartSixthTrajectory(void) {
     }
     
     Thread::Info("MyTraj: start trajectory\n");
+    useFrozenAltitudeRef = false; 
     
     // Obtener posiciones inicial y final
     Vector3Df start_pos;
@@ -372,7 +391,7 @@ void MyTraj::StopSixthTrajectory(void) {
         Thread::Warn("MyTraj: not in trajectory mode\n");
         return;
     }
-    
+    useFrozenAltitudeRef = true;
     sixTrajectory->FinishTraj();
     Thread::Info("MyTraj: finishing trajectory\n");
     

@@ -46,16 +46,18 @@ public:
   void StartTraj(const flair::core::Vector3Df &start_pos);
   void FinishTraj(void);
   void setTargetPosition(flair::core::Vector3Df posTarget);
-  
+    //metodo para obtener yaw 
+  float GetYaw(void) const; 
   bool is_running;
   flair::core::Matrix *output;
   
   // UI controls - trajectory timing 
-  flair::gui::DoubleSpinBox *tobj_ui;     // Time to pick object (intermediate waypoint)
+  flair::gui::DoubleSpinBox *T;
+  flair::gui::DoubleSpinBox *tobj_ui;     // Time to pick object 
   flair::gui::DoubleSpinBox *Gripper;     // Gripper length
-  flair::gui::DoubleSpinBox *target_x;    // Target X position (xobj)
-  flair::gui::DoubleSpinBox *target_z;    // Target Z position (zobj)
-  flair::gui::DoubleSpinBox *target_y;    // Target Z position (zobj)
+  flair::gui::DoubleSpinBox *Xf;    // Posicion final en x 
+  flair::gui::DoubleSpinBox *Yf;   // Posicion final en y
+
 
 private:
   // Métodos para calcular y evaluar el polinomio de 6to grado
@@ -70,6 +72,7 @@ private:
   double EvaluatePositionXY(double t, const Eigen::Matrix<double, 5, 1>& coef);
   double EvaluateVelocityXY(double t, const Eigen::Matrix<double, 5, 1>& coef);
   double EvaluateAccelerationXY(double t, const Eigen::Matrix<double, 5, 1>& coef);
+
   // Variables de tiempo
   flair::core::Time previous_time;
   float CurrentTime;
@@ -97,8 +100,10 @@ private:
   double vy_linear; 
   double y_offset; 
   
-  // UI control
-  flair::gui::DoubleSpinBox *T;
+  //para la orientacion 
+  float computed_yaw;         // Yaw calculado hacia el target
+  bool yaw_frozen;            // Flag para congelar yaw después de tpick
+  float frozen_yaw;           // Último yaw antes de tpick
 };
 
 #endif // TRAJECTORYGENERATOR6_IMPL_H

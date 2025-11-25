@@ -76,6 +76,10 @@ class MyTraj : public flair::meta::UavStateMachine {
         flair::filter::TrajectoryGenerator6 *sixTrajectory;
         
         flair::core::AhrsData *customReferenceOrientation, *customOrientation;
+
+        float frozenAltitudeRef;       // Altitud congelada
+        float frozenAltitudeVelRef;    // Velocidad congelada
+        bool useFrozenAltitudeRef;     // Flag para usar referencia congelada
 };
 
 #endif // MYTRAJ_H

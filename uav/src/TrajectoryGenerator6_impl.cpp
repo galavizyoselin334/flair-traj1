@@ -34,6 +34,10 @@ TrajectoryGenerator6_impl::TrajectoryGenerator6_impl(
   first_update = true;
   is_running = false;
   is_finishing = false;
+      //inicializamos los valores del yaw 
+  yaw_frozen = false;
+  frozen_yaw = 0.0f;
+  computed_yaw = 0.0f;
 
   // init UI
   GroupBox *reglages_groupbox = new GroupBox(position, name);
@@ -41,17 +45,14 @@ TrajectoryGenerator6_impl::TrajectoryGenerator6_impl(
                         0, 1, 0.01);
   //tiempo para recoger el objeto
   tobj_ui = new DoubleSpinBox(reglages_groupbox->LastRowLastCol(), "Object pick time (tobj)",
-                               " s", 0, 100, 1, 1);
+                               " s", 0, 100, 0.5, 1);
+  Gripper = new DoubleSpinBox(reglages_groupbox->LastRowLastCol(), "Offset from the objective in Z",
+                               "m", 0, 3, 0.1, 1);
+  //Xf = new DoubleSpinBox(reglages_groupbox->NewRow(), "Final x position ",
+  //                             "m", -4, 4, 0.1, 1);
+  //Yf = new DoubleSpinBox(reglages_groupbox->LastRowLastCol(), "Final y position",
+  //                             "m", -4, 4, 0.1, 1);
 
-  // Target position (object position)  
-  /*
-  target_x = new DoubleSpinBox(reglages_groupbox->NewRow(), "target X (xobj)",
-                               " m", -10, 10, 0.1, 1, 0);
-  target_y = new DoubleSpinBox(reglages_groupbox->NewRow(), "target Y (xobj)",
-                               " m", -10, 10, 0.1, 1, 0);                  
-  target_z = new DoubleSpinBox(reglages_groupbox->LastRowLastCol(), "target Z (zobj)",
-                               " m", -2, 2, 0.1, 1, 0);
-  */
   // init matrix - 3 rows (position, velocity, acceleration) x 3 cols (x, y, z)
   MatrixDescriptor *desc = new MatrixDescriptor(3, 3);
   desc->SetElementName(0, 0, "pos.x");
@@ -96,7 +97,7 @@ Eigen::Matrix<double,5,1> TrajectoryGenerator6_impl::CalculateCoefficientsXY(dou
   return coef;
 }
 
-// Evaluar posicion en el polinomio de 3ER grado
+// Evaluar posicion en el polinomio de 4to grado
 // X(t) = a*t^4 + b*t^3 + c*t² + d*t + e
 double TrajectoryGenerator6_impl::EvaluatePositionXY(double t, 
                                                     const Eigen::Matrix<double, 5, 1>& coef) {
@@ -220,6 +221,8 @@ void TrajectoryGenerator6_impl::StartTraj(const Vector3Df &start,
   first_update = true;
   is_finishing = false;
 
+  yaw_frozen = false;
+
   start_pos = start;
   des_pos = start;
   CurrentTime = 0;
@@ -230,13 +233,11 @@ void TrajectoryGenerator6_impl::StartTraj(const Vector3Df &start,
   double tf=tobj*2;  //variable auxiliar para definir lo demas
   double tf_traj = (tobj*2)-(tf/5);
   double ti_traj = tf/5;
-  //estos luego los voy a cambiar a que sean los del ninja
-  double xobj = targetPosition.x; //signo negativo porque en la simulacion esta al reves 
+  //estos son los del target
+  double gripper = Gripper->Value(); //aqui obtengo el valor que me dan en la IMU
+  double xobj = targetPosition.x; 
   double yobj = targetPosition.y;
-  double zobj = targetPosition.z - 0.3;
-  //double xobj = target_x->Value();
-  //double yobj = target_y->Value();
-  //double zobj = target_z->Value();
+  double zobj = targetPosition.z - gripper; // para aplicar el offset, para la simulacion hacerlo como 1.2 para que sobrepase al ninja
 
   // Calcular posiciones clave
   double xi = start_pos.x;
@@ -250,7 +251,9 @@ void TrajectoryGenerator6_impl::StartTraj(const Vector3Df &start,
   //simetrica 
   double xf = 2 * xobj - xi; 
   double yf = 2 * yobj - yi; 
- 
+//le damos los valores que estan definidos por el usuario, aqui la trayectoria ya no es simetrica 
+  //double xf = Xf->Value(); 
+  //double yf = Yf->Value(); 
   // Para Z: polinomio de 6to grado
   CalculateCoefficientsZ(zi, zm, zf, ti_traj, tobj, tf_traj);
   coefficients_z = coefficients;
@@ -320,6 +323,24 @@ void TrajectoryGenerator6_impl::Update(Time time) {
       vel.z = 0.0;
       acc.z = 0.0;
     }
+
+      if (CurrentTime <= tobj && !yaw_frozen) {
+      // Durante la trayectoria hasta tpick: mirar hacia el target
+      float dx = targetPosition.x - des_pos.x;
+      float dy = targetPosition.y - des_pos.y;
+      computed_yaw = atan2(dy, dx);
+    } else if (!yaw_frozen) {
+      // Justo después de tpick: congelar el yaw
+      yaw_frozen = true;
+      frozen_yaw = computed_yaw;
+    } else {
+      // Después de tpick: mantener yaw congelado
+      computed_yaw = frozen_yaw;
+    }
+    
+    if (CurrentTime >= tf_traj + 1.0) {
+      is_running = false;
+    }
     
     // Verificar si terminamos completamente
     if (CurrentTime >= tf_traj + 1.0) {  // Darle 1 segundo extra
@@ -346,6 +367,10 @@ void TrajectoryGenerator6_impl::Update(Time time) {
   output->ReleaseMutex();
 
   output->SetDataTime(time);
+}
+
+float TrajectoryGenerator6_impl::GetYaw(void) const {
+  return computed_yaw;
 }
 
 void TrajectoryGenerator6_impl::setTargetPosition(Vector3Df posTarget){

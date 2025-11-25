@@ -100,9 +100,14 @@ void TrajectoryGenerator6::Update(Time time) {
   ProcessUpdate(pimpl_->output);
 }
 
+float TrajectoryGenerator6::GetYaw(void) const {
+  return pimpl_->GetYaw();
+}
+
 void TrajectoryGenerator6::updateTarget(Vector3Df posTarget){
   pimpl_->setTargetPosition(posTarget);
 }
+
 
 } // end namespace filter
 } // end namespace flair

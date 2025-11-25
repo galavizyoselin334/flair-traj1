@@ -122,6 +122,12 @@ public:
   */
   void GetSpeed(core::Vector3Df &point) const;
   void updateTarget(core::Vector3Df posTarget);
+  /*!
+  * \brief Get computed yaw orientation
+  *
+  * \return yaw angle in radians
+  */
+  float GetYaw(void) const;
 
   /*!
   * \brief Acceleration
