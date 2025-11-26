@@ -25,7 +25,6 @@
 #include <MetaVrpnObject.h>
 #include <Tab.h>
 #include <TabWidget.h>
-#include <DataPlot1D.h>
 #include <CheckBox.h>
 #include <Matrix.h>
 #include <cmath>
@@ -75,7 +74,6 @@ MyTraj::MyTraj(TargetController *controller): UavStateMachine(controller),
     positionHold = new PushButton(GetButtonsLayout()->NewRow(), "position hold");
     startSixthTraj = new PushButton(GetButtonsLayout()->NewRow(), "start sixth trajectory");
     stopSixthTraj = new PushButton(GetButtonsLayout()->LastRowLastCol(), "stop sixth trajectory");
- 
     // generador de trayectoria de 6to grado
     sixTrajectory = new TrajectoryGenerator6(vrpnclient->GetLayout()->NewRow(), "Sixth grade trajectory");
     uavVrpn->xPlot()->AddCurve(sixTrajectory->GetMatrix()->Element(0, 0), DataPlot::Blue);
@@ -84,7 +82,6 @@ MyTraj::MyTraj(TargetController *controller): UavStateMachine(controller),
     uavVrpn->VxPlot()->AddCurve(sixTrajectory->GetMatrix()->Element(1, 0), DataPlot::Blue);
     uavVrpn->VyPlot()->AddCurve(sixTrajectory->GetMatrix()->Element(1, 1), DataPlot::Blue);
     uavVrpn->VzPlot()->AddCurve(sixTrajectory->GetMatrix()->Element(1, 2), DataPlot::Blue);
-    
     getFrameworkManager()->AddDeviceToLog(sixTrajectory);
     
     quaternionControl = new Law(setupLawTab->At(1,0), "Quaternion Control");

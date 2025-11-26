@@ -53,8 +53,8 @@ TrajectoryGenerator6_impl::TrajectoryGenerator6_impl(
   //Yf = new DoubleSpinBox(reglages_groupbox->LastRowLastCol(), "Final y position",
   //                             "m", -4, 4, 0.1, 1);
 
-  // init matrix - 3 rows (position, velocity, acceleration) x 3 cols (x, y, z)
-  MatrixDescriptor *desc = new MatrixDescriptor(3, 3);
+  // init matrix - 4 rows (position, velocity, acceleration, yaw) x 3 cols (x, y, z)
+  MatrixDescriptor *desc = new MatrixDescriptor(4, 3);
   desc->SetElementName(0, 0, "pos.x");
   desc->SetElementName(0, 1, "pos.y");
   desc->SetElementName(0, 2, "pos.z");
@@ -64,6 +64,7 @@ TrajectoryGenerator6_impl::TrajectoryGenerator6_impl(
   desc->SetElementName(2, 0, "acc.x");
   desc->SetElementName(2, 1, "acc.y");
   desc->SetElementName(2, 2, "acc.z");
+  desc->SetElementName(3, 0, "yaw");
   output = new Matrix(self, desc, floatType, name);
   delete desc;
 }
@@ -345,6 +346,7 @@ void TrajectoryGenerator6_impl::Update(Time time) {
   output->SetValueNoMutex(2, 0, acc.x);
   output->SetValueNoMutex(2, 1, acc.y);
   output->SetValueNoMutex(2, 2, acc.z);
+  output->SetValueNoMutex(3, 0, computed_yaw);
   output->ReleaseMutex();
 
   output->SetDataTime(time);

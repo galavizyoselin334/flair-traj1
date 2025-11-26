@@ -18,6 +18,7 @@
 
 namespace flair {
     namespace gui {
+        class DataPlot1D;
         class PushButton;
         class DoubleSpinBox;
         class Tab;
@@ -25,7 +26,7 @@ namespace flair {
     }
     namespace filter {
         class TrajectoryGenerator6;
-        class Law;  // ← NUEVO: Tu control con cuaterniones
+        class Law; 
     }
     namespace meta {
         class MetaVrpnObject;
@@ -39,7 +40,6 @@ class MyTraj : public flair::meta::UavStateMachine {
     public:
         MyTraj(flair::sensor::TargetController *controller);
         ~MyTraj();
-
     private:
 
         enum class BehaviourMode_t {

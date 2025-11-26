@@ -156,7 +156,7 @@ void Law::UpdateFrom(const io_data *data) {
 
     Quaternion qt,qd;
 
-    qz = Quaternion(1,0,0,0);
+    // qz = Quaternion(1,0,0,0);
 
     if (Fu.GetNorm()!=0){
         qt.q0=DotProduct(Vector3Df(0,0,-1),Fu)+Fu.GetNorm();      
