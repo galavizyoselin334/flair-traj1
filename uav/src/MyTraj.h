@@ -63,6 +63,7 @@ class MyTraj : public flair::meta::UavStateMachine {
         void GetReferenceAltitude(float &z_ref, float &dz_ref) override;
         void ComputeCustomTorques(flair::core::Euler &torques) override;
         float ComputeCustomThrust(void) override; 
+        void ExitPositionHold(void);
         
         flair::core::AhrsData *GetReferenceOrientation(void) override;
         void SignalEvent(Event_t event) override;
@@ -72,6 +73,7 @@ class MyTraj : public flair::meta::UavStateMachine {
 
         flair::core::Vector2Df posHold;
         float yawHold;
+        float initialYaw; 
 
         flair::gui::PushButton *positionHold;
         flair::gui::PushButton *startSixthTraj, *stopSixthTraj;
@@ -81,9 +83,7 @@ class MyTraj : public flair::meta::UavStateMachine {
         
         flair::core::AhrsData *customReferenceOrientation, *customOrientation;
 
-        float frozenAltitudeRef;       
-        float frozenAltitudeVelRef;    
-        bool useFrozenAltitudeRef;     
+        float zHold;   
 };
 
 #endif // MYTRAJ_H

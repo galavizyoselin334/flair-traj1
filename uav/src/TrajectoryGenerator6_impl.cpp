@@ -34,10 +34,12 @@ TrajectoryGenerator6_impl::TrajectoryGenerator6_impl(
   first_update = true;
   is_running = false;
   is_finishing = false;
-      //inicializamos los valores del yaw 
+  //inicializamos los valores del yaw 
   yaw_frozen = false;
   frozen_yaw = 0.0f;
   computed_yaw = 0.0f;
+  yaw0 = 0.0f;
+  targetYaw = 0.0f;
 
   // init UI
   GroupBox *reglages_groupbox = new GroupBox(position, name);
@@ -48,10 +50,6 @@ TrajectoryGenerator6_impl::TrajectoryGenerator6_impl(
                                " s", 0, 100, 0.5, 1);
   Gripper = new DoubleSpinBox(reglages_groupbox->LastRowLastCol(), "Offset from the objective in Z",
                                "m", 0, 3, 0.1, 1);
-  //Xf = new DoubleSpinBox(reglages_groupbox->NewRow(), "Final x position ",
-  //                             "m", -4, 4, 0.1, 1);
-  //Yf = new DoubleSpinBox(reglages_groupbox->LastRowLastCol(), "Final y position",
-  //                             "m", -4, 4, 0.1, 1);
 
   // init matrix - 4 rows (position, velocity, acceleration, yaw) x 3 cols (x, y, z)
   MatrixDescriptor *desc = new MatrixDescriptor(4, 3);
@@ -73,19 +71,21 @@ TrajectoryGenerator6_impl::~TrajectoryGenerator6_impl() {
   delete output;
 }
 
-Eigen::Matrix<double,5,1> TrajectoryGenerator6_impl::CalculateCoefficientsXY(double xi, double xobj, double xf,
-                                                                             double ti, double tobj, double tf, double vi) {
-  Eigen::Matrix<double,5,5> A = Eigen::Matrix<double,5,5>::Zero();
+Eigen::Matrix<double,6,1> TrajectoryGenerator6_impl::CalculateCoefficientsYaw(double yaw0, double yawTarget,
+                                                                              double ti, double tfac) {
+  Eigen::Matrix<double,6,6> A = Eigen::Matrix<double,6,6>::Zero();
    
-  A << pow(ti,4),   pow(ti,3),   pow(ti,2),   ti,   1,
-       pow(tobj,4),   pow(tobj,3),   pow(tobj,2),   tobj,   1,
-       pow(tf,4),   pow(tf,3),   pow(tf,2),   tf,   1,
-       4*pow(ti,3), 3*pow(ti,2),  2*ti,  1,   0,
-       4*pow(tf,3), 3*pow(tf,2),  2*tf,  1,   0;
-  Eigen::Matrix<double,5,1> b;
-  b << xi, xobj, xf, vi, 0;
+  A << pow(ti,5),     pow(ti,4),     pow(ti,3),    pow(ti,2),   ti,  1,
+       pow(tfac,5),   pow(tfac,4),   pow(tfac,3),  pow(tfac,2), tfac,1,
+       5*pow(ti,4),   4*pow(ti,3),   3*pow(ti,2),  2*ti,        1,   0,
+       5*pow(tfac,4), 4*pow(tfac,3), 3*pow(tfac,2),2*tfac,      1,   0, 
+       20*pow(ti,3),  12*pow(ti,2),  6*ti,         2,           0,   0,
+       20*pow(tfac,3),12*pow(tfac,2),6*tfac,       2,           0,   0;
+       
+  Eigen::Matrix<double,6,1> b;
+  b << yaw0, yawTarget, 0, 0, 0, 0;
 
-  Eigen::Matrix<double,5,1> coef = A.colPivHouseholderQr().solve(b);
+  Eigen::Matrix<double,6,1> coef = A.colPivHouseholderQr().solve(b);
 
   double error = (A * coef - b).norm() / b.norm();
   if (error > 1e-6)
@@ -94,36 +94,56 @@ Eigen::Matrix<double,5,1> TrajectoryGenerator6_impl::CalculateCoefficientsXY(dou
   return coef;
 }
 
-double TrajectoryGenerator6_impl::EvaluatePositionXY(double t, 
-                                                    const Eigen::Matrix<double, 5, 1>& coef) {
-  double t2 = t * t;
-  double t3 = t2 * t;
-  double t4 = t3 * t; 
+Eigen::Matrix<double,6,1> TrajectoryGenerator6_impl::CalculateCoefficientsXY(
+    double xi, double xobj, double xbef, double xf, double tfac,
+    double ti, double tobj, double tf, double vi) {
   
-  return coef(0) * t4 +    // a*t^4
-         coef(1) * t3 +    // b*t^3
-         coef(2) * t2 +     // c*t²
-         coef(3) * t  +      //d*t
-         coef(4);         //e 
+  Eigen::Matrix<double,6,6> A = Eigen::Matrix<double,6,6>::Zero();
+   
+  A << pow(ti,5),   pow(ti,4),   pow(ti,3),   pow(ti,2),   ti,   1,      // t=0: xi
+       pow(tfac,5), pow(tfac,4), pow(tfac,3), pow(tfac,2), tfac, 1,      // t=tfac: xbef  
+       pow(tobj,5), pow(tobj,4), pow(tobj,3), pow(tobj,2), tobj, 1,      // t=tobj: xobj
+       pow(tf,5),   pow(tf,4),   pow(tf,3),   pow(tf,2),   tf,   1,      // t=tf: xf
+       5*pow(ti,4), 4*pow(ti,3), 3*pow(ti,2), 2*ti,        1,    0,      // v(0) = vi
+       5*pow(tf,4), 4*pow(tf,3), 3*pow(tf,2), 2*tf,        1,    0;      // v(tf) = 0
+       
+  Eigen::Matrix<double,6,1> b;
+  b << xi, xbef, xobj, xf, vi, 0;  // ORDEN CORRECTO según los tiempos
+
+  Eigen::Matrix<double,6,1> coef = A.colPivHouseholderQr().solve(b);
+
+  double error = (A * coef - b).norm() / b.norm();
+  if (error > 1e-6)
+      std::cerr << "Warning: Solution error = " << error << std::endl;
+
+  return coef;
 }
 
-double TrajectoryGenerator6_impl::EvaluateVelocityXY(double t,
-                                                    const Eigen::Matrix<double, 5, 1>& coef) {
-  double t2 = t * t;
-  double t3 = t2 * t;
-
-  return 4 * coef(0) * t3 +
-         3 * coef(1) * t2 +
-         2 * coef(2) * t +
-         coef (3);
+double TrajectoryGenerator6_impl::EvaluatePosition(double t, const Eigen::VectorXd& coef) {
+    int grado = coef.size() - 1;
+    double resultado = 0;
+    for (int i = 0; i <= grado; i++) {
+        resultado += coef(i) * pow(t, grado - i);
+    }
+    return resultado;
 }
 
-double TrajectoryGenerator6_impl::EvaluateAccelerationXY(double t,
-                                                        const Eigen::Matrix<double, 5, 1>& coef) {
-  double t2 = t * t;
-  return 12 * coef(0) * t2 +
-         6 * coef(1)  * t +
-         2 * coef(2);
+double TrajectoryGenerator6_impl::EvaluateVelocity(double t, const Eigen::VectorXd& coef) {
+    int grado = coef.size() - 1;
+    double resultado = 0;
+    for (int i = 0; i <= grado-1; i++) {
+        resultado += (grado - i) * coef(i) * pow(t, grado - i - 1);
+    }
+    return resultado;
+}
+
+double TrajectoryGenerator6_impl::EvaluateAcceleration(double t, const Eigen::VectorXd& coef) {
+    int grado = coef.size() - 1;
+    double resultado = 0;
+    for (int i = 0; i <= grado-2; i++) {
+        resultado += (grado-i-1) * (grado - i) * coef(i) * pow(t, grado - i - 2);
+    }
+    return resultado;
 }
 
 void TrajectoryGenerator6_impl::CalculateCoefficientsZ(double zi, double zm, double zf,
@@ -148,58 +168,10 @@ void TrajectoryGenerator6_impl::CalculateCoefficientsZ(double zi, double zm, dou
       std::cerr << "Warning: Solution error = " << error << std::endl;
 }
 
-// Evaluar posicion en el polinomio de 6to grado
-// Z(t) = a*t^6 + b*t^5 + c*t^4 + d*t^3 + e*t^2 + f*t + h
-double TrajectoryGenerator6_impl::EvaluatePosition(double t, 
-                                                    const Eigen::Matrix<double, 7, 1>& coef) {
-  double t2 = t * t;
-  double t3 = t2 * t;
-  double t4 = t3 * t;
-  double t5 = t4 * t;
-  double t6 = t5 * t;
-  
-  return coef(0) * t6 +    // a*t^6
-         coef(1) * t5 +    // b*t^5
-         coef(2) * t4 +    // c*t^4
-         coef(3) * t3 +    // d*t^3
-         coef(4) * t2 +    // e*t^2
-         coef(5) * t +     // f*t
-         coef(6);          // h
-}
-
-
-double TrajectoryGenerator6_impl::EvaluateVelocity(double t,
-                                                    const Eigen::Matrix<double, 7, 1>& coef) {
-  double t2 = t * t;
-  double t3 = t2 * t;
-  double t4 = t3 * t;
-  double t5 = t4 * t;
-  
-  return 6 * coef(0) * t5 +
-         5 * coef(1) * t4 +
-         4 * coef(2) * t3 +
-         3 * coef(3) * t2 +
-         2 * coef(4) * t +
-         coef(5);
-}
-
-
-double TrajectoryGenerator6_impl::EvaluateAcceleration(double t,
-                                                        const Eigen::Matrix<double, 7, 1>& coef) {
-  double t2 = t * t;
-  double t3 = t2 * t;
-  double t4 = t3 * t;
-  
-  return 30 * coef(0) * t4 +
-         20 * coef(1) * t3 +
-         12 * coef(2) * t2 +
-         6 * coef(3) * t +
-         2 * coef(4);
-}
-
 void TrajectoryGenerator6_impl::StartTraj(const Vector3Df &start,
                                           const Vector3Df &end,
-                                          const Vector3Df &start_vel) {
+                                          const Vector3Df &start_vel,
+                                          float start_yaw) {
   is_running = true;
   first_update = true;
   is_finishing = false;
@@ -209,51 +181,96 @@ void TrajectoryGenerator6_impl::StartTraj(const Vector3Df &start,
   start_pos = start;
   des_pos = start;
   CurrentTime = 0;
+  yaw0 = start_yaw;
   
   // Obtener parámetros de UI
   double tobj = tobj_ui->Value();
-  double ti=0; //tiempo inicial de la simulacion 
-  double tf=tobj*2;  //variable auxiliar para definir lo demas
+  double ti = 0;
+  double tf = tobj*2;
   double tf_traj = (tobj*2)-(tf/5);
   double ti_traj = tf/5;
-  //estos son los del target
-  double gripper = Gripper->Value(); //aqui obtengo el valor que me dan en la IMU
+  double tfac = tobj * 0.8;  // Waypoint al 70% del tiempo hacia el objeto
+  
+  // Target
+  double gripper = Gripper->Value(); 
   double xobj = targetPosition.x; 
   double yobj = targetPosition.y;
-  double zobj = targetPosition.z - gripper; // para aplicar el offset, para la simulacion hacerlo como 1.2 para que sobrepase al ninja
-
+  double zobj = targetPosition.z - gripper;
+  
   // Calcular posiciones clave
   double xi = start_pos.x;
   double zi = start_pos.z;
   double yi = start_pos.y; 
   double vxi = start_vel.x;
   double vyi = start_vel.y;
-  double zf = zi;  // Volver a la altura inicial
-  double zm = zobj;  // Altura del objeto + largo del gripper
-  //la posicion final de ambos tiene q ser el doble de la posicion del objeto porq quiero que la trayectoria sea 
-  //simetrica 
-  double xf = 2 * xobj - xi; 
-  double yf = 2 * yobj - yi; 
-//le damos los valores que estan definidos por el usuario, aqui la trayectoria ya no es simetrica 
-  //double xf = Xf->Value(); 
-  //double yf = Yf->Value(); 
-  // Para Z: polinomio de 6to grado
+  double zf = zi;
+  double zm = zobj;
+  
+  // Verificar de qué lado del target está el dron
+  double dx_rel = xi - xobj;
+  double dy_rel = yi - yobj;
+  double projection = dx_rel * cos(targetYaw) + dy_rel * sin(targetYaw);
+  double dis = sqrt((pow(dx_rel,2))+(pow(dy_rel,2)));
+  double xbef, ybef, xf, yf;
+  float yaw_final;
+  
+  if (projection > 0) { //dron adelante del target
+      
+      // Punto de aproximación cerca del target (lado +X)
+      double target_approach_x = xobj + (0.6*dis) * cos(targetYaw);
+      double target_approach_y = yobj + (0.6*dis) * sin(targetYaw);
+      
+      // Waypoint al 70% del camino desde dron hacia punto de aproximación
+      xbef = xi + 0.95 * (target_approach_x - xi);
+      ybef = yi + 0.95 * (target_approach_y - yi);
+      
+      // Final: atravesar el target (lado opuesto)
+      xf = xobj - 1.5 * cos(targetYaw);
+      yf = yobj - 1.5 * sin(targetYaw);
+      
+      // Orientación: cara a cara
+      yaw_final = targetYaw + M_PI;
+      
+  } else { //dron atras del target
+      // Punto de aproximación cerca del target (lado -X)
+      double target_approach_x = xobj - (0.6*dis) * cos(targetYaw);
+      double target_approach_y = yobj - (0.6*dis) * sin(targetYaw);
+      
+      // Waypoint al 70% del camino desde dron hacia punto de aproximación
+      xbef = xi + 0.95 * (target_approach_x - xi);
+      ybef = yi + 0.95 * (target_approach_y - yi);
+      
+      // Final: atravesar el target (lado opuesto)
+      xf = xobj + 1.5 * cos(targetYaw);
+      yf = yobj + 1.5 * sin(targetYaw);
+      
+      // Orientación: misma dirección
+      yaw_final = targetYaw;
+  }
+  
+  // Para Z: polinomio de 7mo grado
   CalculateCoefficientsZ(zi, zm, zf, ti_traj, tobj, tf_traj);
   coefficients_z = coefficients;
-  //para XY: polinomioo de 3er grado 
-  coefficients_x = CalculateCoefficientsXY(xi, xobj, xf, ti, tobj, tf, vxi);
-  coefficients_y = CalculateCoefficientsXY(yi, yobj, yf, ti, tobj, tf, vyi);
+  
+  // Para x e y: polinomio de 6to grado con waypoint dinámico
+  coefficients_x = CalculateCoefficientsXY(xi, xobj, xbef, xf, tfac, ti, tobj, tf, vxi);
+  coefficients_y = CalculateCoefficientsXY(yi, yobj, ybef, yf, tfac, ti, tobj, tf, vyi);
+  
+  // Para yaw: polinomio quíntico
+  coefficients_yaw = CalculateCoefficientsYaw(start_yaw, yaw_final, ti, tfac);
   
   // Guardar tiempos
   this->ti_traj = ti_traj;
   this->tf_traj = tf_traj;
   this->tobj = tobj;
+  this->tfac = tfac;
 }
 
 void TrajectoryGenerator6_impl::StartTraj(const Vector3Df &start) {
   Vector3Df dummy_end;  
-  Vector3Df zero_vel(0, 0, 0);  // Asume velocidad inicial cero
-  StartTraj(start, dummy_end, zero_vel);
+  Vector3Df zero_vel(0, 0, 0);
+  float zero_yaw = 0.0f;
+  StartTraj(start, dummy_end, zero_vel, zero_yaw);
 }
 
 void TrajectoryGenerator6_impl::FinishTraj(void) {
@@ -280,53 +297,44 @@ void TrajectoryGenerator6_impl::Update(Time time) {
   CurrentTime += delta_t;
 
   if (is_running) {
-    //posicion velocidad y aceleracion polinomio 3er grado
-    des_pos.x = EvaluatePositionXY(CurrentTime, coefficients_x);
-    vel.x = EvaluateVelocityXY(CurrentTime, coefficients_x);
-    acc.x = EvaluateAccelerationXY(CurrentTime, coefficients_x);
-    des_pos.y = EvaluatePositionXY(CurrentTime, coefficients_y);
-    vel.y = EvaluateVelocityXY(CurrentTime, coefficients_y);
-    acc.y = EvaluateAccelerationXY(CurrentTime, coefficients_y);
+    // Posición, velocidad y aceleración
+    des_pos.x = EvaluatePosition(CurrentTime, coefficients_x);
+    vel.x = EvaluateVelocity(CurrentTime, coefficients_x);
+    acc.x = EvaluateAcceleration(CurrentTime, coefficients_x);
+    des_pos.y = EvaluatePosition(CurrentTime, coefficients_y);
+    vel.y = EvaluateVelocity(CurrentTime, coefficients_y);
+    acc.y = EvaluateAcceleration(CurrentTime, coefficients_y);
     
-    
-    // posicion en z(polinomio)
+    // Posición en z (polinomio)
     if (CurrentTime <= ti_traj) {
-      // Antes de iniciar la trayectoria Z (aqui solo avanzamos en x)
       des_pos.z = start_pos.z;
       vel.z = 0.0;
       acc.z = 0.0;
     } else if (CurrentTime <= tf_traj) {
-      // Durante la trayectoria polinomial
       des_pos.z = EvaluatePosition(CurrentTime, coefficients_z);
       vel.z = EvaluateVelocity(CurrentTime, coefficients_z);
       acc.z = EvaluateAcceleration(CurrentTime, coefficients_z);
     } else {
-      // Después de terminar la trayectoria
-      des_pos.z = start_pos.z;  // Volver a altura inicial (zf)
+      des_pos.z = start_pos.z;
       vel.z = 0.0;
       acc.z = 0.0;
     }
 
-      if (CurrentTime <= tobj && !yaw_frozen) {
-      // Durante la trayectoria hasta tpick: mirar hacia el target
-      float dx = targetPosition.x - des_pos.x;
-      float dy = targetPosition.y - des_pos.y;
-      computed_yaw = atan2(dy, dx);
-    } else if (!yaw_frozen) {
-      // Justo después de tpick: congelar el yaw
-      yaw_frozen = true;
-      frozen_yaw = computed_yaw;
+    // Interpolación del yaw con polinomio quíntico
+    if (CurrentTime <= tfac) {
+      // Durante la interpolación: evaluar polinomio
+      computed_yaw = EvaluatePosition(CurrentTime, coefficients_yaw);
     } else {
-      // Después de tpick: mantener yaw congelado
+      // Después de tfac: mantener yaw final
+      if (!yaw_frozen) {
+        yaw_frozen = true;
+        frozen_yaw = computed_yaw;
+      }
       computed_yaw = frozen_yaw;
     }
     
-    if (CurrentTime >= tf_traj + 1.0) {
-      is_running = false;
-    }
-    
     // Verificar si terminamos completamente
-    if (CurrentTime >= tf_traj + 1.0) {  // Darle 1 segundo extra
+    if (CurrentTime >= tf_traj + 1.0) {
       is_running = false;
     }
     
@@ -335,6 +343,7 @@ void TrajectoryGenerator6_impl::Update(Time time) {
     vel.x = vel.y = vel.z = 0;
     acc.x = acc.y = acc.z = 0;
   }
+  
   // Actualizar matriz de salida
   output->GetMutex();
   output->SetValueNoMutex(0, 0, des_pos.x);
@@ -356,6 +365,7 @@ float TrajectoryGenerator6_impl::GetYaw(void) const {
   return computed_yaw;
 }
 
-void TrajectoryGenerator6_impl::setTargetPosition(Vector3Df posTarget){
+void TrajectoryGenerator6_impl::setTargetPosition(Vector3Df posTarget, float yawTarget){
   this->targetPosition = posTarget;
+  this->targetYaw = yawTarget;
 }

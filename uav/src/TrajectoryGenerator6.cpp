@@ -50,9 +50,10 @@ Matrix *TrajectoryGenerator6::GetMatrix(void) const {
 }
 
 void TrajectoryGenerator6::StartTraj(const Vector3Df &start_pos,
-                                          const Vector3Df &end_pos,
-                                        const Vector3Df &start_vel) {
-  pimpl_->StartTraj(start_pos, end_pos, start_vel);
+                                     const Vector3Df &end_pos,
+                                     const Vector3Df &start_vel,
+                                     float start_yaw) {
+  pimpl_->StartTraj(start_pos, end_pos, start_vel, start_yaw);
 }
 
 void TrajectoryGenerator6::FinishTraj(void) { 
@@ -94,7 +95,6 @@ void TrajectoryGenerator6::GetAcceleration(Vector3Df &point) const {
   pimpl_->output->ReleaseMutex();
 }
 
-
 void TrajectoryGenerator6::Update(Time time) {
   pimpl_->Update(time);
   ProcessUpdate(pimpl_->output);
@@ -104,10 +104,9 @@ float TrajectoryGenerator6::GetYaw(void) const {
   return pimpl_->GetYaw();
 }
 
-void TrajectoryGenerator6::updateTarget(Vector3Df posTarget){
-  pimpl_->setTargetPosition(posTarget);
+void TrajectoryGenerator6::updateTarget(Vector3Df posTarget, float yawTarget){
+  pimpl_->setTargetPosition(posTarget, yawTarget);
 }
-
 
 } // end namespace filter
 } // end namespace flair
