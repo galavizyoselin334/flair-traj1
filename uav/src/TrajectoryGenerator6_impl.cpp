@@ -217,12 +217,12 @@ void TrajectoryGenerator6_impl::StartTraj(const Vector3Df &start,
   if (projection > 0) { //dron adelante del target
       
       // Punto de aproximación cerca del target (lado +X)
-      double target_approach_x = xobj + (0.6*dis) * cos(targetYaw);
-      double target_approach_y = yobj + (0.6*dis) * sin(targetYaw);
+      double target_approach_x = xobj + (0.4*dis) * cos(targetYaw);
+      double target_approach_y = yobj + (0.4*dis) * sin(targetYaw);
       
       // Waypoint al 70% del camino desde dron hacia punto de aproximación
-      xbef = xi + 0.95 * (target_approach_x - xi);
-      ybef = yi + 0.95 * (target_approach_y - yi);
+      xbef = xi + 0.80 * (target_approach_x - xi);
+      ybef = yi + 0.80 * (target_approach_y - yi);
       
       // Final: atravesar el target (lado opuesto)
       xf = xobj - 1.5 * cos(targetYaw);
@@ -233,12 +233,12 @@ void TrajectoryGenerator6_impl::StartTraj(const Vector3Df &start,
       
   } else { //dron atras del target
       // Punto de aproximación cerca del target (lado -X)
-      double target_approach_x = xobj - (0.6*dis) * cos(targetYaw);
-      double target_approach_y = yobj - (0.6*dis) * sin(targetYaw);
+      double target_approach_x = xobj - (0.4*dis) * cos(targetYaw);
+      double target_approach_y = yobj - (0.4*dis) * sin(targetYaw);
       
       // Waypoint al 70% del camino desde dron hacia punto de aproximación
-      xbef = xi + 0.95 * (target_approach_x - xi);
-      ybef = yi + 0.95 * (target_approach_y - yi);
+      xbef = xi + 0.80 * (target_approach_x - xi);
+      ybef = yi + 0.80 * (target_approach_y - yi);
       
       // Final: atravesar el target (lado opuesto)
       xf = xobj + 1.5 * cos(targetYaw);
