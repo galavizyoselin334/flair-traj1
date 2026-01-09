@@ -190,6 +190,12 @@ void TrajectoryGenerator6_impl::StartTraj(const Vector3Df &start,
   double tf_traj = (tobj*2)-(tf/5);
   double ti_traj = tf/5;
   double tfac = tobj * 0.8;  // Waypoint al 70% del tiempo hacia el objeto
+
+  this->tf = tf;  
+  this->ti_traj = ti_traj;
+  this->tf_traj = tf_traj;
+  this->tobj = tobj;
+  this->tfac = tfac;
   
   // Target
   double gripper = Gripper->Value(); 
@@ -257,7 +263,17 @@ void TrajectoryGenerator6_impl::StartTraj(const Vector3Df &start,
   coefficients_y = CalculateCoefficientsXY(yi, yobj, ybef, yf, tfac, ti, tobj, tf, vyi);
   
   // Para yaw: polinomio quíntico
-  coefficients_yaw = CalculateCoefficientsYaw(start_yaw, yaw_final, ti, tfac);
+  auto wrapToPi = [](double a) {
+  return std::atan2(std::sin(a), std::cos(a)); // [-pi, pi]
+  };
+
+  // tomar el delta mínimo entre yaw_final y start_yaw
+  double dyaw = wrapToPi((double)yaw_final - (double)start_yaw);
+
+  // objetivo "desenvuelto" (continuo) que usa el camino corto
+  double yaw_final_unwrapped = (double)start_yaw + dyaw;
+
+  coefficients_yaw = CalculateCoefficientsYaw((double)start_yaw, yaw_final_unwrapped, ti, tfac);
   
   // Guardar tiempos
   this->ti_traj = ti_traj;
@@ -296,53 +312,60 @@ void TrajectoryGenerator6_impl::Update(Time time) {
   previous_time = time;
   CurrentTime += delta_t;
 
-  if (is_running) {
-    // Posición, velocidad y aceleración
-    des_pos.x = EvaluatePosition(CurrentTime, coefficients_x);
-    vel.x = EvaluateVelocity(CurrentTime, coefficients_x);
-    acc.x = EvaluateAcceleration(CurrentTime, coefficients_x);
-    des_pos.y = EvaluatePosition(CurrentTime, coefficients_y);
-    vel.y = EvaluateVelocity(CurrentTime, coefficients_y);
-    acc.y = EvaluateAcceleration(CurrentTime, coefficients_y);
+if (is_running) {
+    // Posición, velocidad y aceleración en X e Y
+    if (CurrentTime <= tf) {
+        des_pos.x = EvaluatePosition(CurrentTime, coefficients_x);
+        vel.x = EvaluateVelocity(CurrentTime, coefficients_x);
+        acc.x = EvaluateAcceleration(CurrentTime, coefficients_x);
+        des_pos.y = EvaluatePosition(CurrentTime, coefficients_y);
+        vel.y = EvaluateVelocity(CurrentTime, coefficients_y);
+        acc.y = EvaluateAcceleration(CurrentTime, coefficients_y);
+    } else {
+        // Después de tf: mantener última posición
+        vel.x = 0.0;
+        acc.x = 0.0;
+        vel.y = 0.0;
+        acc.y = 0.0;
+    }
     
     // Posición en z (polinomio)
     if (CurrentTime <= ti_traj) {
-      des_pos.z = start_pos.z;
-      vel.z = 0.0;
-      acc.z = 0.0;
+        des_pos.z = start_pos.z;
+        vel.z = 0.0;
+        acc.z = 0.0;
     } else if (CurrentTime <= tf_traj) {
-      des_pos.z = EvaluatePosition(CurrentTime, coefficients_z);
-      vel.z = EvaluateVelocity(CurrentTime, coefficients_z);
-      acc.z = EvaluateAcceleration(CurrentTime, coefficients_z);
+        des_pos.z = EvaluatePosition(CurrentTime, coefficients_z);
+        vel.z = EvaluateVelocity(CurrentTime, coefficients_z);
+        acc.z = EvaluateAcceleration(CurrentTime, coefficients_z);
     } else {
-      des_pos.z = start_pos.z;
-      vel.z = 0.0;
-      acc.z = 0.0;
+        des_pos.z = start_pos.z;
+        vel.z = 0.0;
+        acc.z = 0.0;
     }
-
+    
     // Interpolación del yaw con polinomio quíntico
     if (CurrentTime <= tfac) {
-      // Durante la interpolación: evaluar polinomio
-      computed_yaw = EvaluatePosition(CurrentTime, coefficients_yaw);
+        // Durante la interpolación: evaluar polinomio
+        computed_yaw = EvaluatePosition(CurrentTime, coefficients_yaw);
     } else {
-      // Después de tfac: mantener yaw final
-      if (!yaw_frozen) {
-        yaw_frozen = true;
-        frozen_yaw = computed_yaw;
-      }
-      computed_yaw = frozen_yaw;
+        // Después de tfac: mantener yaw final
+        if (!yaw_frozen) {
+            yaw_frozen = true;
+            frozen_yaw = computed_yaw;
+        }
+        computed_yaw = frozen_yaw;
     }
     
     // Verificar si terminamos completamente
-    if (CurrentTime >= tf_traj + 1.0) {
-      is_running = false;
+    if (CurrentTime >= tf) {
+        is_running = false;
     }
-    
-  } else {
+} else {
     // No está corriendo, mantener posición actual
     vel.x = vel.y = vel.z = 0;
     acc.x = acc.y = acc.z = 0;
-  }
+}
   
   // Actualizar matriz de salida
   output->GetMutex();
