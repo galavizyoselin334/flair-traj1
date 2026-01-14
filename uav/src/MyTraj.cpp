@@ -45,14 +45,14 @@ using namespace flair::sensor;
 using namespace flair::filter;
 using namespace flair::meta;
 
-MyTraj::MyTraj(TargetController *controller): UavStateMachine(controller), 
+MyTraj::MyTraj(TargetController *controller): UavStateMachine(controller),
     behaviourMode(BehaviourMode_t::Default), vrpnLost(false) {
-    
+
     Uav* uav = GetUav();
 
     // Inicializar cliente VRPN
     VrpnClient* vrpnclient = new VrpnClient("vrpn", uav->GetDefaultVrpnAddress(), 80);
-    
+
     if(vrpnclient->ConnectionType() == VrpnClient::Xbee) {
         uavVrpn = new MetaVrpnObject(uav->ObjectName(), '0');
         targetVrpn = new MetaVrpnObject("target", '0');
@@ -63,15 +63,16 @@ MyTraj::MyTraj(TargetController *controller): UavStateMachine(controller),
         uavVrpn = new MetaVrpnObject(uav->ObjectName(), '0');
         targetVrpn = new MetaVrpnObject("target", '0');
     }
-    
+
     getFrameworkManager()->AddDeviceToLog(uavVrpn);
     getFrameworkManager()->AddDeviceToLog(targetVrpn);
     vrpnclient->Start();
 
-    // Botones 
+    // Botones
     positionHold = new PushButton(GetButtonsLayout()->NewRow(), "position hold");
     startSixthTraj = new PushButton(GetButtonsLayout()->NewRow(), "start sixth trajectory");
     stopSixthTraj = new PushButton(GetButtonsLayout()->LastRowLastCol(), "stop sixth trajectory");
+
     // generador de trayectoria de 6to grado
     sixTrajectory = new TrajectoryGenerator6(vrpnclient->GetLayout()->NewRow(), "Sixth grade trajectory");
     uavVrpn->xPlot()->AddCurve(sixTrajectory->GetMatrix()->Element(0, 0), DataPlot::Blue);
@@ -84,15 +85,16 @@ MyTraj::MyTraj(TargetController *controller): UavStateMachine(controller),
 
     uav->GetAhrs()->YawPlot()->AddCurve(uavVrpn->State()->Element(2), DataPlot::Green);
     uav->GetAhrs()->YawPlot()->AddCurve(sixTrajectory->GetMatrix()->Element(3, 0), DataPlot::Black);
-    
+
     quaternionControl = new Law(setupLawTab->At(1,0), "Quaternion Control");
     getFrameworkManager()->AddDeviceToLog(quaternionControl);
+
     // Orientación de referencia
     customReferenceOrientation = new AhrsData(this, "reference");
     uav->GetAhrs()->AddPlot(customReferenceOrientation, DataPlot::Yellow);
     AddDataToControlLawLog(customReferenceOrientation);
     AddDeviceToControlLawLog(quaternionControl);
-    
+
     customOrientation = new AhrsData(this, "orientation");
 }
 
@@ -106,6 +108,7 @@ const AhrsData *MyTraj::GetOrientation(void) const {
     Quaternion ahrsQuaternion;
     Vector3Df ahrsAngularSpeed;
     GetDefaultOrientation()->GetQuaternionAndAngularRates(ahrsQuaternion, ahrsAngularSpeed);
+
     // Mezclar: roll y pitch del IMU, yaw del VRPN
     Euler ahrsEuler = ahrsQuaternion.ToEuler();
     ahrsEuler.yaw = vrpnQuaternion.ToEuler().yaw;
@@ -121,56 +124,79 @@ AhrsData *MyTraj::GetReferenceOrientation(void) {
     Vector3Df des_pos, des_vel;
     Quaternion uav_q;
     Vector3Df uav_w;
+
     // Obtener estados actuales
     uavVrpn->GetPosition(uav_pos);
     uavVrpn->GetSpeed(uav_vel);
     GetOrientation()->GetQuaternionAndAngularRates(uav_q, uav_w);
-    float yaw_ref;
-    
+
+    float yaw_ref = 0.0f;
+    float yaw_rate_ref = 0.0f;
+
     if (behaviourMode == BehaviourMode_t::SixthTrajectory) {
+
+        // ====== NUEVO: actualizar target en cada ciclo ======
+        Vector3Df target_pos, target_vel;
+        Quaternion target_q;
+
+        targetVrpn->GetPosition(target_pos);
+        targetVrpn->GetSpeed(target_vel); // <-- si no compila, dime y lo adapto
+        targetVrpn->GetQuaternion(target_q);
+
+        float targetYaw = target_q.ToEuler().yaw;
+
+        sixTrajectory->updateTargetState(target_pos, target_vel, targetYaw);
+
         // Actualizar trayectoria
         sixTrajectory->Update(GetTime());
         sixTrajectory->GetPosition(des_pos);
         sixTrajectory->GetSpeed(des_vel);
         yaw_ref = sixTrajectory->GetYaw();
-        
+
+        Matrix* m = sixTrajectory->GetMatrix();
+        m->GetMutex();
+        yaw_rate_ref = m->ValueNoMutex(3, 1); // rad/s
+        m->ReleaseMutex();
+
     } else if (behaviourMode == BehaviourMode_t::PositionHold) {
-        // Mantener posición
         yaw_ref = yawHold;
+
         des_pos.x = posHold.x;
         des_pos.y = posHold.y;
         des_pos.z = -zHold;
+
         des_vel.x = 0;
         des_vel.y = 0;
         des_vel.z = 0;
-        
+
+        yaw_rate_ref = 0.0f;
+
     } else {
-        // Modo por defecto
         yaw_ref = yawHold;
+
         des_pos = uav_pos;
         des_vel.x = 0;
         des_vel.y = 0;
         des_vel.z = 0;
+
+        yaw_rate_ref = 0.0f;
     }
-    
+
     // Crear quaternion de yaw deseado
     Quaternion qz(cos(yaw_ref/2), 0, 0, sin(yaw_ref/2));
     qz.Normalize();
-    
-    // Actualizar control de cuaterniones
-    quaternionControl->SetValues(uav_q, qz, uav_w, uav_pos, des_pos, uav_vel, des_vel);
+
+    quaternionControl->SetValues(uav_q, qz, uav_w, uav_pos, des_pos, uav_vel, des_vel, yaw_rate_ref);
     quaternionControl->Update(GetTime());
-    
+
     // Extraer orientación deseada del control
     Quaternion qd;
     qd.q0 = quaternionControl->Output(4);
     qd.q1 = quaternionControl->Output(5);
     qd.q2 = quaternionControl->Output(6);
     qd.q3 = quaternionControl->Output(7);
-    
-    // Convertir a AhrsData
+
     customReferenceOrientation->SetQuaternion(qd);
-    
     return customReferenceOrientation;
 }
 
@@ -179,15 +205,15 @@ void MyTraj::GetReferenceAltitude(float &z_ref, float &dz_ref) {
         Vector3Df des_pos, des_vel;
         sixTrajectory->GetPosition(des_pos);
         sixTrajectory->GetSpeed(des_vel);
-            
+
         z_ref = -des_pos.z;
         dz_ref = -des_vel.z;
-        
+
     } else if (behaviourMode == BehaviourMode_t::PositionHold) {
         // En position hold, mantener la altitud capturada
         z_ref = zHold;
         dz_ref = 0.0f;
-        
+
     } else {
         // Modo Default: control manual
         GetDefaultReferenceAltitude(z_ref, dz_ref);
@@ -199,7 +225,7 @@ void MyTraj::AltitudeValues(float &z, float &dz) const {
 
     uavVrpn->GetPosition(uav_pos);
     uavVrpn->GetSpeed(uav_vel);
-    
+
     // z y dz deben estar en el marco del UAV
     z = -uav_pos.z;
     dz = -uav_vel.z;
@@ -207,9 +233,9 @@ void MyTraj::AltitudeValues(float &z, float &dz) const {
 
 void MyTraj::ComputeCustomTorques(Euler &torques) {
     // extraer los torques calculados en GetReferenceOrientation
-    torques.roll = quaternionControl->Output(0);
+    torques.roll  = quaternionControl->Output(0);
     torques.pitch = quaternionControl->Output(1);
-    torques.yaw = quaternionControl->Output(2);
+    torques.yaw   = quaternionControl->Output(2);
 }
 
 float MyTraj::ComputeCustomThrust(void) {
@@ -261,11 +287,11 @@ void MyTraj::ExtraCheckPushButton(void) {
             VrpnPositionHold();
         }
     }
-    
+
     if(startSixthTraj->Clicked() && (behaviourMode != BehaviourMode_t::SixthTrajectory)) {
         StartSixthTrajectory();
     }
-    
+
     if(stopSixthTraj->Clicked() && (behaviourMode == BehaviourMode_t::SixthTrajectory)) {
         StopSixthTrajectory();
     }
@@ -284,7 +310,7 @@ void MyTraj::ExtraCheckJoystick(void) {
             ExitPositionHold();
         }
     }
-    
+
     // Square (toggle position hold)
     if(GetTargetController()->IsButtonPressed(2)) {
         if(behaviourMode == BehaviourMode_t::Default) {
@@ -293,9 +319,9 @@ void MyTraj::ExtraCheckJoystick(void) {
             VrpnPositionHold();
         }
     }
-    
+
     // Triangle (iniciar trayectoria)
-    if(GetTargetController()->IsButtonPressed(3) && 
+    if(GetTargetController()->IsButtonPressed(3) &&
        (behaviourMode != BehaviourMode_t::SixthTrajectory)) {
         printf("\n>>> TRIANGLE BUTTON PRESSED - Starting trajectory <<<\n");
         fflush(stdout);
@@ -308,7 +334,7 @@ void MyTraj::VrpnPositionHold(void) {
         Thread::Warn("MyTraj: already in vrpn position hold mode\n");
         return;
     }
-    
+
     Quaternion vrpnQuaternion;
     uavVrpn->GetQuaternion(vrpnQuaternion);
     yawHold = vrpnQuaternion.ToEuler().yaw;
@@ -321,8 +347,8 @@ void MyTraj::VrpnPositionHold(void) {
     float z_current, dz_current;
     AltitudeValues(z_current, dz_current);
     zHold = z_current;
-    
-    quaternionControl->Reset(); 
+
+    quaternionControl->Reset();
     behaviourMode = BehaviourMode_t::PositionHold;
     SetOrientationMode(OrientationMode_t::Custom);
     SetAltitudeMode(AltitudeMode_t::Custom);
@@ -338,40 +364,40 @@ void MyTraj::StartSixthTrajectory(void) {
         Thread::Warn("MyTraj: could not set custom orientation mode\n");
         return;
     }
-    
+
     if (!SetAltitudeMode(AltitudeMode_t::Custom)) {
         Thread::Warn("MyTraj: could not set custom altitude mode\n");
         return;
-    }  
+    }
     Thread::Info("MyTraj: start trajectory\n");
-    
-    // Obtener posiciones inicial y final
+
+    // Obtener posiciones inicial y del target
     Vector3Df start_pos;
     uavVrpn->GetPosition(start_pos);
 
-    Vector3Df end_pos;
-    targetVrpn->GetPosition(end_pos);
-   
+    Vector3Df target_pos, target_vel;
+    targetVrpn->GetPosition(target_pos);
+    targetVrpn->GetSpeed(target_vel); 
+
     // Obtener orientación del target
     Quaternion targetQuaternion;
     targetVrpn->GetQuaternion(targetQuaternion);
     float targetYaw = targetQuaternion.ToEuler().yaw;
-    
+
     // Obtener orientación inicial del UAV
     Quaternion uavQuaternion;
     uavVrpn->GetQuaternion(uavQuaternion);
     float startYaw = uavQuaternion.ToEuler().yaw;
-   
+
     Vector3Df start_vel;
     uavVrpn->GetSpeed(start_vel);
 
-    // Enviar posición Y orientación al generador de trayectoria
-    sixTrajectory->updateTarget(end_pos, targetYaw);
-    sixTrajectory->StartTraj(start_pos, end_pos, start_vel, startYaw);
+    // Inicializar target state (nuevo)
+    sixTrajectory->updateTargetState(target_pos, target_vel, targetYaw);
 
-    // Guardar yaw actual
+    sixTrajectory->StartTraj(start_pos, target_pos, start_vel, startYaw);
+
     yawHold = startYaw;
-
     behaviourMode = BehaviourMode_t::SixthTrajectory;
 }
 
@@ -380,10 +406,11 @@ void MyTraj::StopSixthTrajectory(void) {
         Thread::Warn("MyTraj: not in trajectory mode\n");
         return;
     }
-    
+
     sixTrajectory->FinishTraj();
     Thread::Info("MyTraj: finishing trajectory\n");
-    quaternionControl->Reset(); 
+    quaternionControl->Reset();
+
     // Mantener la última posición como position hold
     VrpnPositionHold();
 }
@@ -392,9 +419,9 @@ void MyTraj::ExitPositionHold(void) {
     if(behaviourMode != BehaviourMode_t::PositionHold) {
         return;
     }
-    
+
     Thread::Info("MyTraj: exiting position hold, returning to manual control\n");
-    
+
     // Restaurar modos de control por defecto
     EnterFailSafeMode();
 }

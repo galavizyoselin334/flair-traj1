@@ -4,10 +4,10 @@
 // %flair:license}
 /*!
  * \file TrajectoryGenerator6.h
- * \brief Class generating a linear trajectory in 3D
+ * \brief Trajectory generator wrapper (pimpl)
  * \author Custom Implementation
  * \date 2025/11/03
- * \version 1.0
+ * \version 1.1 (dynamic target API)
  */
 
 #ifndef TRAJECTORYGENERATOR6_H
@@ -16,9 +16,12 @@
 #include <IODevice.h>
 #include <Vector3D.h>
 
+
+
 namespace flair {
 namespace core {
 class Matrix;
+class io_data;     
 }
 namespace gui {
 class LayoutPosition;
@@ -33,7 +36,7 @@ namespace filter {
 class TrajectoryGenerator6 : public core::IODevice {
 public:
   TrajectoryGenerator6(const gui::LayoutPosition *position,
-                            std::string name);
+                       std::string name);
   ~TrajectoryGenerator6();
 
   void StartTraj(const core::Vector3Df &start_pos,
@@ -45,21 +48,35 @@ public:
 
   void StopTraj(void);
   void FinishTraj(void);
+
   void SetMaxVelocity(float value);
   void SetAcceleration(float value);
+
   void Update(core::Time time);
+
   void GetPosition(core::Vector3Df &point) const;
   void GetSpeed(core::Vector3Df &point) const;
-  void updateTarget(core::Vector3Df posTarget, float yawTarget);
-  float GetYaw(void) const;
   void GetAcceleration(core::Vector3Df &point) const;
+
+  // Compatibilidad (viejo)
+  void updateTarget(core::Vector3Df posTarget, float yawTarget);
+
+  // NUEVO: target dinámico (pos + vel + yaw)
+  void updateTargetState(core::Vector3Df posTarget,
+                         core::Vector3Df velTarget,
+                         float yawTarget);
+
+  float GetYaw(void) const;
+
   core::Matrix *GetMatrix(void) const;
   bool IsRunning(void) const;
 
 private:
-  void UpdateFrom(const core::io_data *data) override{};
+  void UpdateFrom(const core::io_data *data) override { (void)data; }
   TrajectoryGenerator6_impl *pimpl_;
 };
+
 } // end namespace filter
 } // end namespace flair
-#endif // TrajectoryGenerator6_H
+
+#endif // TRAJECTORYGENERATOR6_H

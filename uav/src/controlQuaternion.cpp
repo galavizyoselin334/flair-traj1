@@ -23,63 +23,76 @@ namespace flair
 {
 namespace filter
 {
-	
-Law::Law(const LayoutPosition* position,string name) : ControlLaw(position->getLayout(),name,8) {
 
-    input=new Matrix(this,23,1,floatType,name);
-    desc=new MatrixDescriptor(23,1);
+Law::Law(const LayoutPosition* position, string name)
+    : ControlLaw(position->getLayout(), name, 8) {
+
+    input = new Matrix(this, 24, 1, floatType, name);
+    desc  = new MatrixDescriptor(24, 1);
+
     desc->SetElementName(0,0,"q.q0");
     desc->SetElementName(1,0,"q.q1");
     desc->SetElementName(2,0,"q.q2");
     desc->SetElementName(3,0,"q.q3");
+
     desc->SetElementName(4,0,"qd.q0");
     desc->SetElementName(5,0,"qd.q1");
     desc->SetElementName(6,0,"qd.q2");
     desc->SetElementName(7,0,"qd.q3");
+
     desc->SetElementName(8,0,"w.x");
     desc->SetElementName(9,0,"w.y");
     desc->SetElementName(10,0,"w.z");
+
     desc->SetElementName(11,0,"p.x");
     desc->SetElementName(12,0,"p.y");
     desc->SetElementName(13,0,"p.z");
+
     desc->SetElementName(14,0,"p_d.x");
     desc->SetElementName(15,0,"p_d.y");
     desc->SetElementName(16,0,"p_d.z");
+
     desc->SetElementName(17,0,"dp.x");
     desc->SetElementName(18,0,"dp.y");
     desc->SetElementName(19,0,"dp.z");
+
     desc->SetElementName(20,0,"dp_d.x");
     desc->SetElementName(21,0,"dp_d.y");
     desc->SetElementName(22,0,"dp_d.z");
-    stateM=new Matrix(this,desc,floatType,name);
+
+    desc->SetElementName(23,0,"w_ref_yaw");
+
+    stateM = new Matrix(this, desc, floatType, name);
     AddDataToLog(stateM);
+
     Reset();
-    first_update=true;
+    first_update = true;
+
     u_thrust = Vector3Df(0,0,0);
     u_torque = Vector3Df(0,0,0);
-    mass = 0.445;
-    g = 9.81;
+    mass = 0.445f;
+    g = 9.81f;
 
     previous_chrono_time = std::chrono::high_resolution_clock::now();
 
-    p_d = Vector3Df(0,0,1);
+    p_d  = Vector3Df(0,0,1);
     dp_d = Vector3Df(0,0,0);
 
     controlLayout = new GridLayout(position, "PD control");
     GroupBox* control_groupbox_att = new GroupBox(controlLayout->LastRowLastCol(),"Orientation");
-    kpatt=new Vector3DSpinBox(control_groupbox_att->NewRow(),"kp att",0,100,0.01,4);
-    kdatt=new Vector3DSpinBox(control_groupbox_att->NewRow(),"kd att",0,100,0.01,4);
-    satAtt=new DoubleSpinBox(control_groupbox_att->NewRow(),"sat att:",0,1,0.01,4);
+    kpatt  = new Vector3DSpinBox(control_groupbox_att->NewRow(),"kp att",0,100,0.01,4);
+    kdatt  = new Vector3DSpinBox(control_groupbox_att->NewRow(),"kd att",0,100,0.01,4);
+    satAtt = new DoubleSpinBox(control_groupbox_att->NewRow(),"sat att:",0,1,0.01,4);
 
     GroupBox* control_groupbox_trans = new GroupBox(controlLayout->LastRowLastCol(),"Translation");
-    kppos=new Vector3DSpinBox(control_groupbox_trans->NewRow(),"kp pos",0,100,0.01,4);
-    kdpos=new Vector3DSpinBox(control_groupbox_trans->NewRow(),"kd pos",0,100,0.01,4);
-    satPos=new DoubleSpinBox(control_groupbox_trans->NewRow(),"satPos:",0,1,0.1,4);
-    satPosForce=new DoubleSpinBox(control_groupbox_trans->NewRow(),"satPosForce:",0,1,0.1,4);
-    
+    kppos       = new Vector3DSpinBox(control_groupbox_trans->NewRow(),"kp pos",0,100,0.01,4);
+    kdpos       = new Vector3DSpinBox(control_groupbox_trans->NewRow(),"kd pos",0,100,0.01,4);
+    satPos      = new DoubleSpinBox(control_groupbox_trans->NewRow(),"satPos:",0,1,0.1,4);
+    satPosForce = new DoubleSpinBox(control_groupbox_trans->NewRow(),"satPosForce:",0,1,0.1,4);
+
     paramsLayout = new GridLayout(controlLayout->NewRow(), "Params");
     GroupBox* params_groupbox = new GroupBox(paramsLayout->NewRow(),"Params");
-    mg=new DoubleSpinBox(params_groupbox->NewRow(),"mg",0,100,0.0001,4);
+    mg = new DoubleSpinBox(params_groupbox->NewRow(),"mg",0,100,0.0001,4);
 }
 
 Law::~Law(void) {
@@ -92,98 +105,110 @@ void Law::Reset(void) {
     p_d.x = 0;
     p_d.y = 0;
     p_d.z = 0;
+
     dp_d.x = 0;
     dp_d.y = 0;
     dp_d.z = 0;
-    
+
     Fu.x = 0;
     Fu.y = 0;
-    Fu.z = 0.452;
-    
+    Fu.z = 0.452f;
+
     first_update = true;
-    
+
     u_thrust = Vector3Df(0, 0, 0);
-    u_torque = Vector3Df(0, 0, 0);  
+    u_torque = Vector3Df(0, 0, 0);
 }
 
 void Law::UpdateFrom(const io_data *data) {
     float Fth, dt;
-    string currentstate;
 
     input->GetMutex();
     Quaternion q(input->ValueNoMutex(0,0),input->ValueNoMutex(1,0),input->ValueNoMutex(2,0),input->ValueNoMutex(3,0));
     q.Normalize();
+
     Quaternion qz(input->ValueNoMutex(4,0),input->ValueNoMutex(5,0),input->ValueNoMutex(6,0),input->ValueNoMutex(7,0));
+
     Vector3Df w(input->ValueNoMutex(8,0),input->ValueNoMutex(9,0),input->ValueNoMutex(10,0));
+
     Vector3Df p(input->ValueNoMutex(11,0),input->ValueNoMutex(12,0),input->ValueNoMutex(13,0));
     Vector3Df p_d(input->ValueNoMutex(14,0),input->ValueNoMutex(15,0),input->ValueNoMutex(16,0));
+
     Vector3Df dp(input->ValueNoMutex(17,0),input->ValueNoMutex(18,0),input->ValueNoMutex(19,0));
     Vector3Df dp_d(input->ValueNoMutex(20,0),input->ValueNoMutex(21,0),input->ValueNoMutex(22,0));
+
+    float yaw_rate_ref = input->ValueNoMutex(23,0);
+
     input->ReleaseMutex();
 
-    Vector3Df pos_err=p-(p_d);
-    Vector3Df vel_err=dp-(dp_d);
-    Vector3Df ppos,dpos;
+    Vector3Df pos_err = p - (p_d);
+    Vector3Df vel_err = dp - (dp_d);
+
+    Vector3Df ppos, dpos;
 
     if(first_update==true) {
         previous_chrono_time = std::chrono::high_resolution_clock::now();
-        dt=0;
-        Fu.x=0;
-        Fu.y=0;
-        Fu.z=0.452;
-        first_update=false;
+        dt = 0;
+        Fu.x = 0;
+        Fu.y = 0;
+        Fu.z = 0.452f;
+        first_update = false;
     }
-
 
     auto current_time = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> alt_dt = current_time - previous_chrono_time;
     dt = alt_dt.count();
 
-	if (pos_err.GetNorm()>satPos->Value()){
-		Vector3Df sat_pos_err = pos_err*(satPos->Value()/pos_err.GetNorm());
+    if (pos_err.GetNorm() > satPos->Value()){
+        Vector3Df sat_pos_err = pos_err * (satPos->Value() / pos_err.GetNorm());
+        (void)sat_pos_err; 
     }
-//posicion 
-    ppos = -kppos->Value()*pos_err;
-    dpos = -kdpos->Value()*vel_err;
+
+    // Posición
+    ppos = -kppos->Value() * pos_err;
+    dpos = -kdpos->Value() * vel_err;
 
     Fu = (ppos + dpos);
 
-	Fu.Saturate(satPosForce->Value());
-    Fu.z = Fu.z - (mass * g /10);
-	Fth = -Fu.GetNorm();
+    Fu.Saturate(satPosForce->Value());
+    Fu.z = Fu.z - (mass * g / 10.0f);
 
-    if (Fth>0){Fth = 0;}
+    Fth = -Fu.GetNorm();
+    if (Fth > 0) { Fth = 0; }
 
-    Quaternion qt,qd;
+    Quaternion qt, qd;
 
-    // qz = Quaternion(1,0,0,0);
-
-    if (Fu.GetNorm()!=0){
-        qt.q0=DotProduct(Vector3Df(0,0,-1),Fu)+Fu.GetNorm();      
-        Vector3Df tmp=CrossProduct(Vector3Df(0,0,-1),Fu);       
-        qt.q1=tmp.x;
-        qt.q2=tmp.y;
-        qt.q3=tmp.z;
+    if (Fu.GetNorm() != 0) {
+        qt.q0 = DotProduct(Vector3Df(0,0,-1), Fu) + Fu.GetNorm();
+        Vector3Df tmp = CrossProduct(Vector3Df(0,0,-1), Fu);
+        qt.q1 = tmp.x;
+        qt.q2 = tmp.y;
+        qt.q3 = tmp.z;
         qt.Normalize();
-        qd = qt*qz;
+
+        qd = qt * qz;
         qd.Normalize();
-    }else{
+    } else {
         qt = q;
         qd = qt;
         qd.Normalize();
     }
-	Quaternion qe = qd.GetConjugate()*q;
-	Vector3Df thetae = 2*qe.GetLogarithm();
 
-    qe = qd.GetConjugate()*q;
-    thetae=2*qe.GetLogarithm();
+    Quaternion qe = qd.GetConjugate() * q;
+    Vector3Df thetae = 2 * qe.GetLogarithm();
 
-    Vector3Df patt,datt;
-    patt = kpatt->Value()*thetae;
-    datt = kdatt->Value()*w;
+    // Control actitud
+    Vector3Df patt, datt;
+    patt = kpatt->Value() * thetae;
+
+    // w_err = w - [0,0,yaw_rate_ref]
+    Vector3Df w_ref(0.0f, 0.0f, yaw_rate_ref);
+    Vector3Df w_err = w - w_ref;
+
+    datt = kdatt->Value() * w_err;
 
     Vector3Df Tau_u = patt + datt;
-    Vector3Df Tau=Tau_u;
+    Vector3Df Tau = Tau_u;
     Tau.Saturate(satAtt->Value());
 
     u_thrust = Fu;
@@ -194,68 +219,89 @@ void Law::UpdateFrom(const io_data *data) {
     output->SetValue(2,0,Tau.z);
     output->SetValue(3,0,Fth);
     output->SetDataTime(data->DataTime());
-	
-	output->SetValue(4,0,qd.q0);
+
+    output->SetValue(4,0,qd.q0);
     output->SetValue(5,0,qd.q1);
     output->SetValue(6,0,qd.q2);
-	output->SetValue(7,0,qd.q3);
+    output->SetValue(7,0,qd.q3);
 
+    // Log de estado
     stateM->GetMutex();
     stateM->SetValueNoMutex(0,0,q.q0);
     stateM->SetValueNoMutex(1,0,q.q1);
     stateM->SetValueNoMutex(2,0,q.q2);
     stateM->SetValueNoMutex(3,0,q.q3);
+
     stateM->SetValueNoMutex(4,0,qd.q0);
     stateM->SetValueNoMutex(5,0,qd.q1);
     stateM->SetValueNoMutex(6,0,qd.q2);
     stateM->SetValueNoMutex(7,0,qd.q3);
+
     stateM->SetValueNoMutex(8,0,w.x);
     stateM->SetValueNoMutex(9,0,w.y);
     stateM->SetValueNoMutex(10,0,w.z);
+
     stateM->SetValueNoMutex(11,0,p.x);
     stateM->SetValueNoMutex(12,0,p.y);
     stateM->SetValueNoMutex(13,0,p.z);
+
     stateM->SetValueNoMutex(14,0,p_d.x);
     stateM->SetValueNoMutex(15,0,p_d.y);
     stateM->SetValueNoMutex(16,0,p_d.z);
+
     stateM->SetValueNoMutex(17,0,dp.x);
     stateM->SetValueNoMutex(18,0,dp.y);
     stateM->SetValueNoMutex(19,0,dp.z);
+
     stateM->SetValueNoMutex(20,0,dp_d.x);
     stateM->SetValueNoMutex(21,0,dp_d.y);
     stateM->SetValueNoMutex(22,0,dp_d.z);
+
+    stateM->SetValueNoMutex(23,0,yaw_rate_ref);
+
     stateM->ReleaseMutex();
 
     previous_chrono_time = current_time;
     ProcessUpdate(output);
 }
 
-void Law::SetValues(Quaternion q,Quaternion qd,Vector3Df w,core::Vector3Df p,core::Vector3Df p_d,core::Vector3Df dp,core::Vector3Df dp_d) {
+void Law::SetValues(Quaternion q, Quaternion qd, Vector3Df w,
+                    core::Vector3Df p, core::Vector3Df p_d,
+                    core::Vector3Df dp, core::Vector3Df dp_d,
+                    float yaw_rate_ref) {
+
     input->SetValue(0,0,q.q0);
     input->SetValue(1,0,q.q1);
     input->SetValue(2,0,q.q2);
     input->SetValue(3,0,q.q3);
+
     input->SetValue(4,0,qd.q0);
     input->SetValue(5,0,qd.q1);
     input->SetValue(6,0,qd.q2);
     input->SetValue(7,0,qd.q3);
+
     input->SetValue(8,0,w.x);
     input->SetValue(9,0,w.y);
     input->SetValue(10,0,w.z);
+
     input->SetValue(11,0,p.x);
     input->SetValue(12,0,p.y);
     input->SetValue(13,0,p.z);
+
     input->SetValue(14,0,p_d.x);
     input->SetValue(15,0,p_d.y);
     input->SetValue(16,0,p_d.z);
+
     input->SetValue(17,0,dp.x);
     input->SetValue(18,0,dp.y);
     input->SetValue(19,0,dp.z);
+
     input->SetValue(20,0,dp_d.x);
     input->SetValue(21,0,dp_d.y);
     input->SetValue(22,0,dp_d.z);
-}
 
+    input->SetValue(23,0,yaw_rate_ref);
+}
 
 void Law::SetTarget(Vector3Df target_pos, Vector3Df target_vel, Quaternion target_yaw){
     p_d = target_pos;

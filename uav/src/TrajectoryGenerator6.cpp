@@ -7,15 +7,13 @@
 //
 //  author:     Custom Implementation
 //
-//  version:    $Id: $
-//
-//  purpose:    Class generating a linear trajectory in 3D
-//
+//  purpose:    Trajectory generator wrapper (pimpl)
 //
 /*********************************************************************/
 
 #include "TrajectoryGenerator6.h"
 #include "TrajectoryGenerator6_impl.h"
+
 #include <Matrix.h>
 #include <Layout.h>
 #include <LayoutPosition.h>
@@ -37,8 +35,8 @@ TrajectoryGenerator6::TrajectoryGenerator6(
   SetIsReady(true);
 }
 
-TrajectoryGenerator6::~TrajectoryGenerator6() { 
-  delete pimpl_; 
+TrajectoryGenerator6::~TrajectoryGenerator6() {
+  delete pimpl_;
 }
 
 bool TrajectoryGenerator6::IsRunning(void) const {
@@ -56,19 +54,20 @@ void TrajectoryGenerator6::StartTraj(const Vector3Df &start_pos,
   pimpl_->StartTraj(start_pos, end_pos, start_vel, start_yaw);
 }
 
-void TrajectoryGenerator6::FinishTraj(void) { 
-  pimpl_->FinishTraj(); 
+void TrajectoryGenerator6::FinishTraj(void) {
+  pimpl_->FinishTraj();
 }
 
-void TrajectoryGenerator6::StopTraj(void) { 
-  pimpl_->is_running = false; 
+void TrajectoryGenerator6::StopTraj(void) {
+  pimpl_->is_running = false;
 }
 
 void TrajectoryGenerator6::SetMaxVelocity(float value) {
-  
+  (void)value;
 }
 
 void TrajectoryGenerator6::SetAcceleration(float value) {
+  (void)value;
 }
 
 void TrajectoryGenerator6::GetPosition(Vector3Df &point) const {
@@ -104,8 +103,16 @@ float TrajectoryGenerator6::GetYaw(void) const {
   return pimpl_->GetYaw();
 }
 
-void TrajectoryGenerator6::updateTarget(Vector3Df posTarget, float yawTarget){
+// Compatibilidad (viejo)
+void TrajectoryGenerator6::updateTarget(Vector3Df posTarget, float yawTarget) {
   pimpl_->setTargetPosition(posTarget, yawTarget);
+}
+
+// NUEVO: target dinámico (pos + vel + yaw)
+void TrajectoryGenerator6::updateTargetState(Vector3Df posTarget,
+                                             Vector3Df velTarget,
+                                             float yawTarget) {
+  pimpl_->setTargetState(posTarget, velTarget, yawTarget);
 }
 
 } // end namespace filter
