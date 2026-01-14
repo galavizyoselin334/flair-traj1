@@ -23,57 +23,69 @@ namespace flair {
 
 namespace flair {
 namespace filter {
-    class Law : public ControlLaw {
-        public:
-            
-            std::chrono::high_resolution_clock::time_point previous_chrono_time;
 
-            flair::core::Vector3Df u_thrust;
-            flair::core::Vector3Df u_torque;
+class Law : public ControlLaw {
+public:
+    std::chrono::high_resolution_clock::time_point previous_chrono_time;
 
-            float g;
-            float mass;
+    flair::core::Vector3Df u_thrust;
+    flair::core::Vector3Df u_torque;
 
-            flair::gui::GridLayout *controlLayout;
-            flair::gui::GridLayout *paramsLayout;
+    float g;
+    float mass;
 
-            flair::gui::GroupBox *control_groupbox_att;
-            flair::gui::GroupBox *control_groupbox_trans;
-            
-            flair::gui::Vector3DSpinBox *kpatt;
-            flair::gui::Vector3DSpinBox *kdatt;
-            flair::gui::DoubleSpinBox *satAtt;
+    flair::gui::GridLayout *controlLayout;
+    flair::gui::GridLayout *paramsLayout;
 
-            flair::gui::Vector3DSpinBox *kppos;
-            flair::gui::Vector3DSpinBox *kdpos;
-			flair::gui::DoubleSpinBox *satPos;
-            flair::gui::DoubleSpinBox *satPosForce;
+    flair::gui::GroupBox *control_groupbox_att;
+    flair::gui::GroupBox *control_groupbox_trans;
 
-            flair::gui::DoubleSpinBox *mg;
-            flair::gui::DoubleSpinBox *CustomDeltaT;
+    flair::gui::Vector3DSpinBox *kpatt;
+    flair::gui::Vector3DSpinBox *kdatt;
+    flair::gui::DoubleSpinBox *satAtt;
 
-            flair::core::Vector3Df p_d;    // Desire position
-            flair::core::Vector3Df dp_d;   // Desire velocity
-            flair::core::Vector3Df Fu;
+    flair::gui::Vector3DSpinBox *kppos;
+    flair::gui::Vector3DSpinBox *kdpos;
+    flair::gui::DoubleSpinBox *satPos;
+    flair::gui::DoubleSpinBox *satPosForce;
 
-            float previous_time;
-            bool first_update;
-            
-            flair::core::MatrixDescriptor *desc;
-            flair::core::Matrix *stateM;
-            
-            ~Law(void);
-            Law(const gui::LayoutPosition* position,std::string name);
-            void UseDefaultPlot(const gui::LayoutPosition* position);
-            void Reset(void);
-            void UpdateFrom(const core::io_data *data);
-            void SetValues(core::Quaternion q,core::Quaternion qd,core::Vector3Df w,core::Vector3Df p, core::Vector3Df p_d,core::Vector3Df dp,core::Vector3Df dp_d);
-        
-            void SetTarget(core::Vector3Df, core::Vector3Df, core::Quaternion);
+    flair::gui::DoubleSpinBox *mg;
+    flair::gui::DoubleSpinBox *CustomDeltaT;
 
-        private:
-    };
-}
-}
+    flair::core::Vector3Df p_d;    // Desire position
+    flair::core::Vector3Df dp_d;   // Desire velocity
+    flair::core::Vector3Df Fu;
+
+    float previous_time;
+    bool first_update;
+
+    flair::core::MatrixDescriptor *desc;
+    flair::core::Matrix *stateM;
+
+    ~Law(void);
+    Law(const gui::LayoutPosition* position, std::string name);
+
+    void UseDefaultPlot(const gui::LayoutPosition* position);
+    void Reset(void);
+    void UpdateFrom(const core::io_data *data);
+
+    // ✅ Nuevo parámetro yaw_rate_ref (rad/s)
+    void SetValues(core::Quaternion q,
+                   core::Quaternion qd,
+                   core::Vector3Df w,
+                   core::Vector3Df p,
+                   core::Vector3Df p_d,
+                   core::Vector3Df dp,
+                   core::Vector3Df dp_d,
+                   float yaw_rate_ref);
+
+    void SetTarget(core::Vector3Df, core::Vector3Df, core::Quaternion);
+
+private:
+    // nada
+};
+
+} // namespace filter
+} // namespace flair
 
 #endif // CONTROLQUATERNION_H

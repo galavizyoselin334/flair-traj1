@@ -121,58 +121,69 @@ AhrsData *MyTraj::GetReferenceOrientation(void) {
     Vector3Df des_pos, des_vel;
     Quaternion uav_q;
     Vector3Df uav_w;
+
     // Obtener estados actuales
     uavVrpn->GetPosition(uav_pos);
     uavVrpn->GetSpeed(uav_vel);
     GetOrientation()->GetQuaternionAndAngularRates(uav_q, uav_w);
-    float yaw_ref;
-    
+
+    float yaw_ref = 0.0f;
+    float yaw_rate_ref = 0.0f;   
+
     if (behaviourMode == BehaviourMode_t::SixthTrajectory) {
         // Actualizar trayectoria
         sixTrajectory->Update(GetTime());
         sixTrajectory->GetPosition(des_pos);
         sixTrajectory->GetSpeed(des_vel);
         yaw_ref = sixTrajectory->GetYaw();
-        
+
+        Matrix* m = sixTrajectory->GetMatrix();
+        m->GetMutex();
+        yaw_rate_ref = m->ValueNoMutex(3, 1); // rad/s
+        m->ReleaseMutex();
+
     } else if (behaviourMode == BehaviourMode_t::PositionHold) {
-        // Mantener posición
         yaw_ref = yawHold;
+
         des_pos.x = posHold.x;
         des_pos.y = posHold.y;
         des_pos.z = -zHold;
+
         des_vel.x = 0;
         des_vel.y = 0;
         des_vel.z = 0;
-        
+
+        yaw_rate_ref = 0.0f; 
+
     } else {
-        // Modo por defecto
         yaw_ref = yawHold;
+
         des_pos = uav_pos;
         des_vel.x = 0;
         des_vel.y = 0;
         des_vel.z = 0;
+
+        yaw_rate_ref = 0.0f; 
     }
-    
+
     // Crear quaternion de yaw deseado
     Quaternion qz(cos(yaw_ref/2), 0, 0, sin(yaw_ref/2));
     qz.Normalize();
-    
-    // Actualizar control de cuaterniones
-    quaternionControl->SetValues(uav_q, qz, uav_w, uav_pos, des_pos, uav_vel, des_vel);
+
+    quaternionControl->SetValues(uav_q, qz, uav_w, uav_pos, des_pos, uav_vel, des_vel, yaw_rate_ref);
     quaternionControl->Update(GetTime());
-    
+
     // Extraer orientación deseada del control
     Quaternion qd;
     qd.q0 = quaternionControl->Output(4);
     qd.q1 = quaternionControl->Output(5);
     qd.q2 = quaternionControl->Output(6);
     qd.q3 = quaternionControl->Output(7);
-    
-    // Convertir a AhrsData
+
     customReferenceOrientation->SetQuaternion(qd);
-    
     return customReferenceOrientation;
 }
+
 
 void MyTraj::GetReferenceAltitude(float &z_ref, float &dz_ref) {
     if (behaviourMode == BehaviourMode_t::SixthTrajectory) {
